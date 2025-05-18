@@ -1,125 +1,157 @@
+// lib/presentation/pages/home_page.dart
+// lib/presentation/pages/home_page.dart
 import 'package:distincia_carros/controller/auth_controller.dart';
+import 'package:distincia_carros/controller/home_page_controller.dart'; // Importar
+import 'package:distincia_carros/controller/trip_controller.dart';
+import 'package:distincia_carros/presentation/pages/create_trip_form_page.dart';
+import 'package:distincia_carros/presentation/pages/profile_page.dart';
+import 'package:distincia_carros/presentation/pages/trip_details_page.dart';
+// Importa tu pantalla de lista de recorridos (TripsListScreen)
+import 'package:distincia_carros/presentation/widgets/trip_list_item.dart'; // O donde esté TripsListScreen
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class HomePage extends StatefulWidget {
-  @override
-  _HomePageState createState() => _HomePageState();
-}
+class HomePage extends StatelessWidget { // Puede seguir siendo StatelessWidget
+  final AuthController authController = Get.find<AuthController>();
+  final HomePageController homePageCtrl = Get.find<HomePageController>(); // Encontrar el controlador inyectado
 
-class _HomePageState extends State<HomePage> {
-  final AuthController authController = Get.find();
-  int _selectedIndex = 0; // Para manejar la selección de la BottomNavigationBar
+  HomePage({super.key});
 
-  // Lista de widgets para la BottomNavigationBar (puedes expandir esto)
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Index 0: Home', // Placeholder para la vista de Home
-    ),
-    Text(
-      'Index 1: Add', // Placeholder para la vista de "Add"
-    ),
+  // Definir las páginas/widgets para cada pestaña
+  final List<Widget> _widgetOptions = <Widget>[
+    TripsListScreen(),       // Pestaña 0: Lista de recorridos
+    CreateTripFormPage(),  // Pestaña 1: Formulario para crear recorrido
+    ProfilePage(),         // Pestaña 2: Perfil de usuario
   ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      // Aquí puedes añadir lógica para navegar a diferentes secciones o cambiar el contenido
-      // basado en el ítem seleccionado. Por ahora, solo actualiza el índice.
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-    // Datos de ejemplo para el GridView. Reemplaza esto con tus datos reales.
-    final List<Widget> gridItems = [
-      // Primer elemento: Imagen del carro
-      Card(
-        elevation: 2.0,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Image.network( // Puedes cambiar esto por Image.asset si la tienes localmente
-            'https://www.manualdecodificacion.cl/wp-content/uploads/2021/05/renault-sandero-ii-2012-2017-hatchback-5-puertas-2.jpg', // URL de ejemplo
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Center(child: Icon(Icons.car_repair, size: 50, color: Colors.grey)); // Placeholder en caso de error
-            },
-            loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Center(
-                child: CircularProgressIndicator(
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                      : null,
-                ),
-              );
-            },
-          ),
-        ),
-      ),
-      // Elementos placeholder grises
-      _buildPlaceholderCard(),
-      _buildPlaceholderCard(),
-      _buildPlaceholderCard(),
-      _buildPlaceholderCard(),
-      _buildPlaceholderCard(),
-      _buildPlaceholderCard(),
-      _buildPlaceholderCard(),
-    ];
-
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home'), // Título como en la imagen
+        title: Obx(() { // Título reactivo basado en la pestaña
+          int currentIndex = homePageCtrl.tabIndex.value;
+          if (currentIndex == 0) return const Text('Mis Recorridos');
+          if (currentIndex == 1) return const Text('Crear Nuevo Recorrido');
+          if (currentIndex == 2) return const Text('Mi Perfil');
+          return const Text('App Recorridos');
+        }),
         actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () {
-              authController.logout();
-            },
-          ),
+          Obx(() => homePageCtrl.tabIndex.value == 2
+              ? IconButton(
+                  icon: const Icon(Icons.logout),
+                  tooltip: 'Cerrar Sesión',
+                  onPressed: () {
+                    authController.logout();
+                  },
+                )
+              : const SizedBox.shrink()),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0), // Espaciado alrededor del GridView
-        child: GridView.count(
-          crossAxisCount: 2, // Dos columnas como en la imagen
-          crossAxisSpacing: 8.0, // Espacio horizontal entre tarjetas
-          mainAxisSpacing: 8.0,  // Espacio vertical entre tarjetas
-          children: gridItems,
+      body: Obx(() => _widgetOptions.elementAt(homePageCtrl.tabIndex.value)), // Cuerpo reactivo
+      bottomNavigationBar: Obx( // BottomNavigationBar reactiva
+        () => BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.list_alt_outlined),
+              activeIcon: Icon(Icons.list_alt),
+              label: 'Recorridos',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.add_location_alt_outlined),
+              activeIcon: Icon(Icons.add_location_alt),
+              label: 'Crear',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              activeIcon: Icon(Icons.person),
+              label: 'Perfil',
+            ),
+          ],
+          currentIndex: homePageCtrl.tabIndex.value, // Índice reactivo
+          selectedItemColor: Theme.of(context).primaryColorDark,
+          unselectedItemColor: Colors.grey[600],
+          onTap: homePageCtrl.changeTabIndex, // Método del controlador para cambiar pestaña
+          type: BottomNavigationBarType.fixed,
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label: 'Add',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue, // Color del ítem seleccionado
-        unselectedItemColor: Colors.grey, // Color de los ítems no seleccionados
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed, // Para que se vean todas las etiquetas
       ),
     );
   }
+}
 
-  // Widget auxiliar para crear las tarjetas placeholder
-  Widget _buildPlaceholderCard() {
-    return Card(
-      elevation: 2.0,
-      color: Colors.grey[300], // Color gris para el placeholder
-      child: Center(
-        child: Icon(
-          Icons.image, // Icono de imagen como placeholder
-          color: Colors.grey[600],
-          size: 40.0,
+// Widget interno o en un archivo separado para la lista de recorridos
+class TripsListScreen extends StatelessWidget {
+  final TripController tripController = Get.find<TripController>();
+
+  TripsListScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      if (tripController.isLoading.value && tripController.userTrips.isEmpty) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      if (tripController.errorMessage.value.isNotEmpty && tripController.userTrips.isEmpty) {
+        return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, color: Colors.red, size: 60),
+                  SizedBox(height:10),
+                  Text("Error", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  SizedBox(height:5),
+                  Text(tripController.errorMessage.value, textAlign: TextAlign.center),
+                  SizedBox(height:20),
+                  ElevatedButton(onPressed: ()=> tripController.fetchUserTrips(), child: Text("Reintentar"))
+                ],
+              ),
+            ));
+      }
+      if (tripController.userTrips.isEmpty) {
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.map_outlined, size: 100, color: Colors.grey[400]),
+                const SizedBox(height: 20),
+                Text(
+                  'No has creado ningún recorrido aún.',
+                  style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Presiona la pestaña "+" para registrar tu primer recorrido.',
+                  style: TextStyle(fontSize: 16, color: Colors.grey[500]),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+      return RefreshIndicator(
+        onRefresh: () => tripController.fetchUserTrips(),
+        child: ListView.builder(
+          padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 80.0), // Padding inferior para no tapar con BottomNav
+          itemCount: tripController.userTrips.length,
+          itemBuilder: (context, index) {
+            final trip = tripController.userTrips[index];
+            return TripListItem(
+              trip: trip,
+              onTap: () {
+                Get.to(() => TripDetailsPage(trip: trip));
+              },
+              onDelete: () { // La confirmación ya está en el controlador
+                tripController.deleteTrip(trip.id);
+              },
+            );
+          },
         ),
-      ),
-    );
+      );
+    });
   }
 }
