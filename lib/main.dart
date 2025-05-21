@@ -1,4 +1,3 @@
-// lib/main.dart
 import 'package:distincia_carros/controller/auth_controller.dart';
 import 'package:distincia_carros/controller/home_page_controller.dart';
 import 'package:distincia_carros/data/repositories/auth_repository.dart';
@@ -11,6 +10,8 @@ import 'package:distincia_carros/core/config/app_config.dart';
 import 'package:distincia_carros/controller/profile_controller.dart';
 import 'package:distincia_carros/controller/trip_controller.dart'; 
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:distincia_carros/controller/trip_controller.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -18,12 +19,12 @@ void main() async {
   final authRepository = AuthRepository(account);
 
   Get.put(AuthController(authRepository));
-  Get.put(ProfileController());   
-  Get.put(TripController());     
+  Get.put(ProfileController());  
+  Get.put(TripController());      
   Get.put(HomePageController());  
 
   final authController = Get.find<AuthController>();
-  await authController.checkAuth(); 
+  await authController.checkAuth();
 
   bool isLoggedIn = authController.appwriteUser.value != null;
 
@@ -36,13 +37,13 @@ void main() async {
         GetPage(name: '/login', page: () => LoginPage()),
         GetPage(name: '/register', page: () => RegisterPage()),
         GetPage(name: '/home', page: () => HomePage()),
-        ],
+      ],
       theme: ThemeData(
-        primarySwatch: Colors.teal, 
-        scaffoldBackgroundColor: Colors.grey[50],
+        primarySwatch: Colors.teal,
+        scaffoldBackgroundColor: Colors.grey[50], 
         appBarTheme: AppBarTheme(
           backgroundColor: Colors.teal[700],
-          foregroundColor: Colors.white, 
+          foregroundColor: Colors.white,
           elevation: 2,
           titleTextStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
         ),
@@ -92,11 +93,16 @@ void main() async {
           foregroundColor: Colors.white,
         ),
       ),
-    supportedLocales: const [
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
         Locale('es', 'CO'), 
         Locale('en', 'US'), 
       ],
-      locale: const Locale('es', 'CO'), 
+      locale: const Locale('es', 'CO'),
     ),
   );
 }
