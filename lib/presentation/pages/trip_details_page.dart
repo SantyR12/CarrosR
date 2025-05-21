@@ -1,5 +1,3 @@
-// lib/presentation/pages/trip_details_page.dart
-import 'dart:async';
 import 'package:distincia_carros/data/models/trip_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' as latlong;
 
-const String MAPTILER_API_KEY_DETAILS = "IMdKNAWagDsTUpy68b5d"; // Tu clave de MapTiler
+const String MAPTILER_API_KEY_DETAILS = "IMdKNAWagDsTUpy68b5d";
 
 class TripDetailsPage extends StatefulWidget {
   final Trip trip;
@@ -27,7 +25,6 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
   @override
   void initState() {
     super.initState();
-    // _initializeDetailsMapData se llamará desde onMapReady
   }
 
   void _initializeDetailsMapData(){
@@ -137,11 +134,11 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
   @override
   Widget build(BuildContext context) {
     latlong.LatLng initialMapCenter = latlong.LatLng(widget.trip.startLatitude, widget.trip.startLongitude);
-     if (_markers.isNotEmpty && _routePointsForMapVisual.isEmpty) { // Si solo hay marcadores y no ruta, centrar en marcadores
+     if (_markers.isNotEmpty && _routePointsForMapVisual.isEmpty) { 
         double avgLat = _markers.map((m) => m.point.latitude).reduce((a, b) => a + b) / _markers.length;
         double avgLng = _markers.map((m) => m.point.longitude).reduce((a, b) => a + b) / _markers.length;
         initialMapCenter = latlong.LatLng(avgLat, avgLng);
-    } else if (_routePointsForMapVisual.isNotEmpty) { // Si hay ruta, centrar en la ruta
+    } else if (_routePointsForMapVisual.isNotEmpty) { 
         double avgLat = _routePointsForMapVisual.map((p) => p.latitude).reduce((a,b) => a+b) / _routePointsForMapVisual.length;
         double avgLng = _routePointsForMapVisual.map((p) => p.longitude).reduce((a,b) => a+b) / _routePointsForMapVisual.length;
         initialMapCenter = latlong.LatLng(avgLat, avgLng);
@@ -193,9 +190,8 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
                 children: [
                   TileLayer(
                     urlTemplate: "https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=$MAPTILER_API_KEY_DETAILS",
-                    userAgentPackageName: 'com.tuempresa.distincia_carros', // Reemplaza
+                    userAgentPackageName: 'com.tuempresa.distincia_carros',
                   ),
-                  // Condicionar PolylineLayer
                   if (_polylines.isNotEmpty && _polylines.first.points.isNotEmpty && _polylines.first.points.length >=2)
                     PolylineLayer(polylines: _polylines),
                   MarkerLayer(markers: _markers),

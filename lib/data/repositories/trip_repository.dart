@@ -1,9 +1,7 @@
-// lib/data/repositories/trip_repository.dart
 import 'package:appwrite/appwrite.dart';
 import 'package:distincia_carros/core/constants/appwrite_constants.dart';
 import 'package:distincia_carros/data/models/trip_model.dart';
 import 'package:distincia_carros/core/config/app_config.dart';
-
 class TripRepository {
   final Databases _databases;
 
@@ -16,7 +14,7 @@ class TripRepository {
         collectionId: AppwriteConstants.tripsCollectionId,
         queries: [
           Query.equal('userId', userId),
-          Query.orderDesc('\$createdAt') // Mostrar los más recientes primero
+          Query.orderDesc('\$createdAt') 
         ],
       );
       return response.documents.map((doc) => Trip.fromMap(doc.data)).toList();
@@ -35,14 +33,13 @@ class TripRepository {
         databaseId: AppwriteConstants.databaseId,
         collectionId: AppwriteConstants.tripsCollectionId,
         documentId: ID.unique(),
-        data: trip.toMap(), // Asegúrate que toMap() no incluya '$id' ni '$createdAt'
+        data: trip.toMap(), 
         permissions: [
           Permission.read(Role.user(trip.userId)),
           Permission.update(Role.user(trip.userId)),
           Permission.delete(Role.user(trip.userId)),
         ],
       );
-      // Appwrite devuelve el documento creado, incluyendo $id y $createdAt
       return Trip.fromMap(document.data);
     } on AppwriteException catch (e) {
       print('AppwriteException en createTrip: ${e.message}');
@@ -58,8 +55,8 @@ class TripRepository {
       final document = await _databases.updateDocument(
         databaseId: AppwriteConstants.databaseId,
         collectionId: AppwriteConstants.tripsCollectionId,
-        documentId: trip.id, // El $id del documento existente
-        data: trip.toMap(), // toMap() debería excluir $id y $createdAt
+        documentId: trip.id,
+        data: trip.toMap(), 
       );
       return Trip.fromMap(document.data);
     } on AppwriteException catch (e) {

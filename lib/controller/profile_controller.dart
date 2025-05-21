@@ -1,4 +1,3 @@
-// lib/controller/profile_controller.dart
 import 'dart:io';
 import 'package:distincia_carros/controller/auth_controller.dart';
 import 'package:distincia_carros/data/models/user_profile_model.dart';
@@ -6,24 +5,20 @@ import 'package:distincia_carros/data/repositories/profile_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-
 class ProfileController extends GetxController {
   final ProfileRepository _profileRepository = ProfileRepository();
-  // AuthController se obtendrá con Get.find() cuando se necesite,
-  // para evitar dependencia circular directa en la inicialización.
 
   Rx<UserProfile?> userProfile = Rx<UserProfile?>(null);
   RxBool isLoading = false.obs;
   RxString errorMessage = ''.obs;
 
   final ImagePicker _picker = ImagePicker();
-  Rx<File?> pickedImageFile = Rx<File?>(null); // Para la previsualización de la imagen
+  Rx<File?> pickedImageFile = Rx<File?>(null); 
 
   @override
   void onInit() {
     super.onInit();
-    // Escuchar cambios en el usuario autenticado para cargar/limpiar el perfil
-    ever(Get.find<AuthController>().appwriteUser, (ModelsUser) { // ModelsUser es Models.User?
+    ever(Get.find<AuthController>().appwriteUser, (ModelsUser) { 
       if (ModelsUser != null) {
         fetchUserProfile();
       } else {
@@ -31,7 +26,6 @@ class ProfileController extends GetxController {
         pickedImageFile.value = null;
       }
     });
-    // Carga inicial si el usuario ya está logueado al iniciar el controller
     if (Get.find<AuthController>().appwriteUser.value != null) {
         fetchUserProfile();
     }
@@ -43,7 +37,7 @@ class ProfileController extends GetxController {
 
     if (userId == null) {
       errorMessage.value = "Usuario no autenticado. No se puede cargar el perfil.";
-      userProfile.value = null; // Asegurar que el perfil se limpie
+      userProfile.value = null; 
       print(errorMessage.value);
       return;
     }
@@ -54,9 +48,6 @@ class ProfileController extends GetxController {
       userProfile.value = await _profileRepository.getUserProfile(userId);
       if (userProfile.value == null) {
         print("No se encontró perfil para el usuario: $userId. Se podría crear uno nuevo.");
-        // Considera si quieres crear un perfil automáticamente aquí
-        // o manejarlo desde la UI (ej. un botón "Crear mi perfil").
-        // Por ahora, solo se loguea. La creación se maneja tras el registro.
       }
     } catch (e) {
       errorMessage.value = e.toString().replaceFirst('Exception: ', '');
@@ -79,7 +70,6 @@ class ProfileController extends GetxController {
     isLoading.value = true;
     errorMessage.value = '';
     try {
-      // Verificar si ya existe un perfil para evitar duplicados
       UserProfile? existingProfile = await _profileRepository.getUserProfile(userId);
       if (existingProfile != null) {
         userProfile.value = existingProfile;
@@ -88,11 +78,10 @@ class ProfileController extends GetxController {
       }
 
       UserProfile newProfile = UserProfile(
-        id: '', // Appwrite lo generará, ProfileRepository espera un ID para update, no para create
+        id: '', 
         userId: userId,
         name: name,
         email: email,
-        // phone, profileImageUrl, profileImageFileId son opcionales y se pueden añadir después
       );
       userProfile.value = await _profileRepository.createUserProfile(newProfile);
       Get.snackbar('Perfil Creado', 'Tu perfil básico ha sido configurado.',
@@ -110,7 +99,6 @@ class ProfileController extends GetxController {
   Future<void> updateUserProfileData({
     required String name,
     String? phone,
-    // La imagen (File) se toma de pickedImageFile.value
   }) async {
     if (userProfile.value == null) {
       errorMessage.value = "No hay perfil para actualizar.";
@@ -122,22 +110,20 @@ class ProfileController extends GetxController {
     errorMessage.value = '';
     try {
       UserProfile profileToUpdate = UserProfile(
-        id: userProfile.value!.id, // ID del documento existente
+        id: userProfile.value!.id,
         userId: userProfile.value!.userId,
         name: name,
-        email: userProfile.value!.email, // Email no se actualiza desde aquí
+        email: userProfile.value!.email, 
         phone: phone,
-        // Mantener la URL/FileId actual si no se elige una nueva imagen
         profileImageUrl: userProfile.value!.profileImageUrl,
         profileImageFileId: userProfile.value!.profileImageFileId,
       );
 
-      // El ProfileRepository.updateUserProfile se encargará de subir `pickedImageFile.value` si existe
       userProfile.value = await _profileRepository.updateUserProfile(profileToUpdate, newImageFile: pickedImageFile.value);
       
-      pickedImageFile.value = null; // Limpiar la imagen previsualizada después de guardar
+      pickedImageFile.value = null; 
       Get.snackbar('Éxito', 'Perfil actualizado correctamente.', snackPosition: SnackPosition.BOTTOM);
-      fetchUserProfile(); // Recargar para asegurar consistencia, aunque updateUserProfile ya devuelve el actualizado.
+      fetchUserProfile(); 
     } catch (e) {
       errorMessage.value = e.toString().replaceFirst('Exception: ', '');
       Get.snackbar('Error', 'No se pudo actualizar el perfil: ${errorMessage.value}',
@@ -151,12 +137,11 @@ class ProfileController extends GetxController {
     try {
       final XFile? image = await _picker.pickImage(
         source: source,
-        imageQuality: 70, // Comprimir un poco la imagen
-        maxWidth: 800,    // Reducir dimensiones si es muy grande
+        imageQuality: 70, 
+        maxWidth: 800,   
       );
       if (image != null) {
         pickedImageFile.value = File(image.path);
-        // No se sube aquí, solo se previsualiza. La subida ocurre al guardar el perfil.
       }
     } catch (e) {
       errorMessage.value = "Error seleccionando imagen: $e";

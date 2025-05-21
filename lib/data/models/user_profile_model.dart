@@ -1,14 +1,11 @@
-// lib/data/models/user_profile_model.dart
-import 'package:flutter/foundation.dart';
-
 class UserProfile {
-  final String id; // Appwrite document ID
-  final String userId; // Appwrite Auth User ID
+  final String id; 
+  final String userId; 
   String name;
   String email;
   String? phone;
   String? profileImageUrl;
-  String? profileImageFileId; // Para gestionar el archivo en Appwrite Storage
+  String? profileImageFileId; 
 
   UserProfile({
     required this.id,

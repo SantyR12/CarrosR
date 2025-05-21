@@ -1,10 +1,7 @@
-
 import 'package:distincia_carros/controller/auth_controller.dart';
 import 'package:distincia_carros/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-
 
 class RegisterPage extends StatelessWidget {
   final _emailController = TextEditingController();

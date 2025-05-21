@@ -1,34 +1,30 @@
-// lib/presentation/pages/home_page.dart
-// lib/presentation/pages/home_page.dart
 import 'package:distincia_carros/controller/auth_controller.dart';
-import 'package:distincia_carros/controller/home_page_controller.dart'; // Importar
+import 'package:distincia_carros/controller/home_page_controller.dart';
 import 'package:distincia_carros/controller/trip_controller.dart';
 import 'package:distincia_carros/presentation/pages/create_trip_form_page.dart';
 import 'package:distincia_carros/presentation/pages/profile_page.dart';
 import 'package:distincia_carros/presentation/pages/trip_details_page.dart';
-// Importa tu pantalla de lista de recorridos (TripsListScreen)
-import 'package:distincia_carros/presentation/widgets/trip_list_item.dart'; // O donde esté TripsListScreen
+import 'package:distincia_carros/presentation/widgets/trip_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-class HomePage extends StatelessWidget { // Puede seguir siendo StatelessWidget
+class HomePage extends StatelessWidget { 
   final AuthController authController = Get.find<AuthController>();
-  final HomePageController homePageCtrl = Get.find<HomePageController>(); // Encontrar el controlador inyectado
+  final HomePageController homePageCtrl = Get.find<HomePageController>();
 
   HomePage({super.key});
 
   // Definir las páginas/widgets para cada pestaña
   final List<Widget> _widgetOptions = <Widget>[
-    TripsListScreen(),       // Pestaña 0: Lista de recorridos
-    CreateTripFormPage(),  // Pestaña 1: Formulario para crear recorrido
-    ProfilePage(),         // Pestaña 2: Perfil de usuario
+    TripsListScreen(),       
+    CreateTripFormPage(),  
+    ProfilePage(),        
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Obx(() { // Título reactivo basado en la pestaña
+        title: Obx(() { 
           int currentIndex = homePageCtrl.tabIndex.value;
           if (currentIndex == 0) return const Text('Mis Recorridos');
           if (currentIndex == 1) return const Text('Crear Nuevo Recorrido');
@@ -47,8 +43,8 @@ class HomePage extends StatelessWidget { // Puede seguir siendo StatelessWidget
               : const SizedBox.shrink()),
         ],
       ),
-      body: Obx(() => _widgetOptions.elementAt(homePageCtrl.tabIndex.value)), // Cuerpo reactivo
-      bottomNavigationBar: Obx( // BottomNavigationBar reactiva
+      body: Obx(() => _widgetOptions.elementAt(homePageCtrl.tabIndex.value)), 
+      bottomNavigationBar: Obx(
         () => BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
@@ -67,18 +63,16 @@ class HomePage extends StatelessWidget { // Puede seguir siendo StatelessWidget
               label: 'Perfil',
             ),
           ],
-          currentIndex: homePageCtrl.tabIndex.value, // Índice reactivo
+          currentIndex: homePageCtrl.tabIndex.value, 
           selectedItemColor: Theme.of(context).primaryColorDark,
           unselectedItemColor: Colors.grey[600],
-          onTap: homePageCtrl.changeTabIndex, // Método del controlador para cambiar pestaña
+          onTap: homePageCtrl.changeTabIndex,
           type: BottomNavigationBarType.fixed,
         ),
       ),
     );
   }
 }
-
-// Widget interno o en un archivo separado para la lista de recorridos
 class TripsListScreen extends StatelessWidget {
   final TripController tripController = Get.find<TripController>();
 
@@ -136,7 +130,7 @@ class TripsListScreen extends StatelessWidget {
       return RefreshIndicator(
         onRefresh: () => tripController.fetchUserTrips(),
         child: ListView.builder(
-          padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 80.0), // Padding inferior para no tapar con BottomNav
+          padding: const EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 80.0),
           itemCount: tripController.userTrips.length,
           itemBuilder: (context, index) {
             final trip = tripController.userTrips[index];
@@ -145,7 +139,7 @@ class TripsListScreen extends StatelessWidget {
               onTap: () {
                 Get.to(() => TripDetailsPage(trip: trip));
               },
-              onDelete: () { // La confirmación ya está en el controlador
+              onDelete: () {
                 tripController.deleteTrip(trip.id);
               },
             );

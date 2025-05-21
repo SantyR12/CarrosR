@@ -1,12 +1,9 @@
-// lib/presentation/pages/create_trip_form_page.dart
-import 'dart:io'; // Para File
 import 'package:distincia_carros/controller/trip_controller.dart';
 import 'package:distincia_carros/presentation/pages/map_route_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart'; // Para ImageSource
-
+import 'package:image_picker/image_picker.dart'; 
 class CreateTripFormPage extends StatelessWidget {
   final TripController tripController = Get.find<TripController>();
 
@@ -56,15 +53,7 @@ class CreateTripFormPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Limpiar datos al entrar a la página si no se viene del mapa (donde se quieren preservar)
-    // Opcional: podrías querer que siempre se limpie al entrar a esta pestaña.
-    // La limpieza principal ocurre en clearTripCreationData() después de guardar
-    // o si el usuario cierra sesión.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-        // Limpiar solo si no venimos de la página de mapa
-        // Esto es un poco complicado de manejar perfectamente con GetX sin un estado más explícito
-        // de "estoy en medio de una creación". Por ahora, lo dejamos así,
-        // la limpieza principal es en clearTripCreationData().
     });
 
 
@@ -77,7 +66,6 @@ class CreateTripFormPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              // Selector de Imagen del Vehículo
               const SizedBox(height: 16),
               Center(
                 child: Text(
@@ -160,7 +148,7 @@ class CreateTripFormPage extends StatelessWidget {
                 controller: tripController.vehicleModelController,
                 decoration: InputDecoration(
                   labelText: 'Modelo del Vehículo',
-                  prefixIcon: Icon(Icons.rv_hookup_outlined), // Icono diferente
+                  prefixIcon: Icon(Icons.rv_hookup_outlined), 
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                 ),
                 validator: (value) => (value == null || value.trim().isEmpty) ? 'El modelo es requerido' : null,
@@ -179,7 +167,7 @@ class CreateTripFormPage extends StatelessWidget {
                   if (value == null || value.trim().isEmpty) return 'El año es requerido';
                   if (value.length != 4) return 'Año inválido (ej: 2023)';
                   final year = int.tryParse(value);
-                  if (year == null || year < 1900 || year > DateTime.now().year + 2) { // +2 para permitir modelos del próximo año
+                  if (year == null || year < 1900 || year > DateTime.now().year + 2) { 
                     return 'Año fuera de rango';
                   }
                   return null;
@@ -208,7 +196,7 @@ class CreateTripFormPage extends StatelessWidget {
                 ),
                 onPressed: () {
                   if (tripController.formKeyCreateTrip.currentState!.validate()) {
-                    Get.to(() => MapRoutePage(), transition: Transition.cupertino); // Ejemplo de transición
+                    Get.to(() => MapRoutePage(), transition: Transition.cupertino); 
                   } else {
                     Get.snackbar(
                       "Campos Incompletos",
@@ -220,7 +208,7 @@ class CreateTripFormPage extends StatelessWidget {
                   }
                 },
               ),
-              const SizedBox(height: 20), // Espacio al final
+              const SizedBox(height: 20), 
             ],
           ),
         ),

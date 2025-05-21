@@ -1,31 +1,28 @@
-// lib/presentation/pages/map_route_page.dart
 import 'dart:async';
 import 'dart:convert';
 import 'package:distincia_carros/controller/trip_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart' as latlong; // Usar con prefijo para claridad
+import 'package:latlong2/latlong.dart' as latlong; 
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 
-const String MAPTILER_API_KEY = "IMdKNAWagDsTUpy68b5d"; // Tu clave de MapTiler
-const String OPENROUTESERVICE_API_KEY = "5b3ce3597851110001cf62484b05b43d095541ed9a40e378ca759ad5"; // <-- ¡REEMPLAZA CON TU CLAVE REAL DE ORS!
-
+const String MAPTILER_API_KEY = "IMdKNAWagDsTUpy68b5d"; 
+const String OPENROUTESERVICE_API_KEY = "5b3ce3597851110001cf62484b05b43d095541ed9a40e378ca759ad5"; 
 class MapRoutePage extends StatefulWidget {
   const MapRoutePage({super.key});
 
   @override
   State<MapRoutePage> createState() => _MapRoutePageState();
 }
-
 class _MapRoutePageState extends State<MapRoutePage> {
   final TripController tripController = Get.find<TripController>();
   final MapController _mapController = MapController();
 
   List<latlong.LatLng> _currentRoutePoints = [];
   List<Marker> _markers = [];
-  latlong.LatLng _initialCenter = latlong.LatLng(1.2136, -77.2793); // Pasto, Nariño
+  latlong.LatLng _initialCenter = latlong.LatLng(1.2136, -77.2793);
   double _initialZoom = 13.0;
   bool _isSettingStartPoint = true;
   bool _isMapReady = false;
@@ -33,7 +30,6 @@ class _MapRoutePageState extends State<MapRoutePage> {
   @override
   void initState() {
     super.initState();
-    // _initializeMapRelatedData se llamará desde onMapReady
   }
 
   void _initializeMapRelatedData() {
@@ -45,7 +41,6 @@ class _MapRoutePageState extends State<MapRoutePage> {
     List<Marker> initialMarkers = [];
     bool shouldCenterMap = false;
 
-    // Asumimos que TripController usa latlong.LatLng para startPoint y endPoint.
     final latlong.LatLng? startP = tripController.startPoint.value;
     final latlong.LatLng? endP = tripController.endPoint.value;
 
@@ -166,7 +161,7 @@ class _MapRoutePageState extends State<MapRoutePage> {
     if (OPENROUTESERVICE_API_KEY == "5b3ce3597851110001cf62484b05b43d095541ed9a40e378ca759ad0") {
         Get.snackbar("API Key Faltante", "Añade tu API Key de OpenRouteService.",
         backgroundColor: Colors.red, colorText: Colors.white, duration: Duration(seconds: 5));
-        _fallbackToStraightLine(); // Intentar al menos dibujar línea recta
+        _fallbackToStraightLine(); 
         return;
     }
     _showLoadingDialog("Calculando ruta...");
@@ -286,26 +281,19 @@ class _MapRoutePageState extends State<MapRoutePage> {
     }
     
     if (pointsToBound.isNotEmpty) {
-        // Usar LatLngBounds de flutter_map (que es en realidad latlong.LatLngBounds)
         var calculatedBounds = LatLngBounds.fromPoints(pointsToBound);
-
-        // Un LatLngBounds es "válido" si puede definir una esquina suroeste y noreste.
-        // fromPoints() debería manejar la creación de un bound válido si hay al menos un punto.
-        // La principal condición es que calculatedBounds no sea nulo (lo cual fromPoints asegura si la lista no está vacía)
-        // y que las coordenadas no sean NaN o infinitas (poco probable con LatLng).
-        // Una forma simple de chequear si es más que un punto:
         bool isArea = calculatedBounds.southEast != calculatedBounds.northWest;
 
 
-        if (isArea || pointsToBound.length > 1) { // Si es un área o más de un punto (para que fitCamera tenga sentido)
+        if (isArea || pointsToBound.length > 1) { 
              _mapController.fitCamera(
                 CameraFit.bounds(
                     bounds: calculatedBounds, 
                     padding: const EdgeInsets.all(50.0) 
                 )
             );
-        } else if (pointsToBound.length == 1) { // Si solo hay un punto
-            _mapController.move(pointsToBound.first, 15.0); // Zoom a ese único punto
+        } else if (pointsToBound.length == 1) { 
+            _mapController.move(pointsToBound.first, 15.0); 
         } else {
             print("Bounds no válidos o insuficientes para centrar el mapa. Centrando en _initialCenter.");
             _mapController.move(_initialCenter, _initialZoom);

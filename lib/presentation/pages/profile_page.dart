@@ -1,15 +1,12 @@
-// lib/presentation/pages/profile_page.dart
-import 'package:distincia_carros/controller/auth_controller.dart'; // Necesario para logout
+import 'package:distincia_carros/controller/auth_controller.dart'; 
 import 'package:distincia_carros/controller/profile_controller.dart';
 import 'package:distincia_carros/presentation/pages/edit_profil_page.dart';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart'; // Para ImageSource
+import 'package:image_picker/image_picker.dart'; 
 
 class ProfilePage extends StatelessWidget {
-  // AuthController se usa para el logout, que ahora está en el AppBar de HomePage
-  // final AuthController authController = Get.find<AuthController>();
   final ProfileController profileController = Get.find<ProfileController>();
 
   ProfilePage({super.key});
@@ -29,7 +26,7 @@ class ProfilePage extends StatelessWidget {
                 title: const Text('Seleccionar de la Galería'),
                 onTap: () {
                   profileController.pickImage(ImageSource.gallery);
-                  Get.back(); // Cerrar el bottom sheet
+                  Get.back();
                 },
               ),
               ListTile(
@@ -37,7 +34,7 @@ class ProfilePage extends StatelessWidget {
                 title: const Text('Tomar una Foto'),
                 onTap: () {
                   profileController.pickImage(ImageSource.camera);
-                  Get.back(); // Cerrar el bottom sheet
+                  Get.back(); 
                 },
               ),
               if (profileController.pickedImageFile.value != null || 
@@ -49,12 +46,7 @@ class ProfilePage extends StatelessWidget {
                   leading: Icon(Icons.delete_outline, color: Colors.red[400]),
                   title: Text('Eliminar Imagen Actual', style: TextStyle(color: Colors.red[700])),
                   onTap: () {
-                    // Lógica para eliminar: limpiar pickedImage y poner URL/FileId a null en el perfil
                     profileController.pickedImageFile.value = null; 
-                    // Para que se elimine del backend, se debe guardar el perfil con URL y FileId nulos
-                    // Esto se haría en la página de Editar Perfil al guardar.
-                    // Aquí solo limpiamos la previsualización.
-                    // Si quieres que se refleje inmediatamente en DB, necesitarías una función `removeProfileImage`
                     Get.back();
                     Get.snackbar("Imagen Eliminada", "La imagen se quitará al guardar los cambios en 'Editar Perfil'.");
                   },
@@ -70,10 +62,7 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // El ProfileController debería llamar a fetchUserProfile en su onInit
-    // o cuando cambie el estado de autenticación.
     return Scaffold(
-      // El AppBar es manejado por HomePage si esta es una de sus pestañas.
       body: Obx(() {
         if (profileController.isLoading.value && profileController.userProfile.value == null) {
           return const Center(child: CircularProgressIndicator());
@@ -100,7 +89,6 @@ class ProfilePage extends StatelessWidget {
                       icon: Icon(Icons.add_circle_outline),
                       label: const Text("Crear Mi Perfil"),
                       onPressed: () {
-                        // Crear perfil inicial y luego ir a editarlo
                         profileController.createInitialProfile(authUser.name, authUser.email)
                           .then((_) {
                               if(profileController.userProfile.value != null) {
@@ -123,13 +111,13 @@ class ProfilePage extends StatelessWidget {
         final profile = profileController.userProfile.value!;
         return RefreshIndicator(
           onRefresh: () => profileController.fetchUserProfile(),
-          child: ListView( // Usar ListView para permitir scroll si el contenido es largo
+          child: ListView( 
             padding: const EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 20.0),
             children: <Widget>[
               Center(
                 child: GestureDetector(
                   onTap: () => _showImagePickerOptions(context),
-                  child: Obx(() { // Obx para la imagen que puede cambiar
+                  child: Obx(() { 
                     Widget avatarContent;
                     if (profileController.pickedImageFile.value != null) {
                       avatarContent = CircleAvatar(
@@ -141,12 +129,10 @@ class ProfilePage extends StatelessWidget {
                         radius: 70,
                         backgroundImage: NetworkImage(profile.profileImageUrl!),
                         onBackgroundImageError: (exception, stackTrace) {
-                          // Placeholder si hay error cargando la imagen de red
                           print("Error cargando NetworkImage: $exception");
-                          // setState(() { _imageError = true; }); // si es StatefulWidget
                         },
-                        child: (profile.profileImageUrl == null || profile.profileImageUrl!.isEmpty) // Condición redundante si NetworkImage falla
-                            ? Icon(Icons.person, size: 70, color: Colors.grey[400]) // Placeholder
+                        child: (profile.profileImageUrl == null || profile.profileImageUrl!.isEmpty)
+                            ? Icon(Icons.person, size: 70, color: Colors.grey[400]) 
                             : null,
                       );
                     } else {
@@ -190,27 +176,9 @@ class ProfilePage extends StatelessWidget {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))
                 ),
                 onPressed: () {
-                  // Asegurarse de pasar el perfil actual (con la imagen remota si no hay pickedFile)
-                  // pickedImageFile se maneja dentro del ProfileController
                   Get.to(() => EditProfilePage(currentProfile: profileController.userProfile.value!));
                 },
               ),
-              // El botón de Logout ahora está en el AppBar de HomePage.
-              // Si también lo quieres aquí:
-              // const SizedBox(height: 15),
-              // OutlinedButton.icon(
-              //   icon: const Icon(Icons.logout, color: Colors.redAccent),
-              //   label: const Text('Cerrar Sesión', style: TextStyle(color: Colors.redAccent)),
-              //   style: OutlinedButton.styleFrom(
-              //     padding: const EdgeInsets.symmetric(vertical: 14),
-              //     side: BorderSide(color: Colors.redAccent.withOpacity(0.5)),
-              //     textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))
-              //   ),
-              //   onPressed: () {
-              //     Get.find<AuthController>().logout();
-              //   },
-              // ),
             ],
           ),
         );

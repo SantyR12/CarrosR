@@ -1,46 +1,40 @@
-// lib/controller/trip_controller.dart
-import 'dart:io'; // Para File
+import 'dart:io';
 import 'package:distincia_carros/controller/auth_controller.dart';
 import 'package:distincia_carros/controller/home_page_controller.dart';
 import 'package:distincia_carros/data/models/trip_model.dart';
 import 'package:distincia_carros/data/repositories/trip_repository.dart';
-import 'package:distincia_carros/core/config/app_config.dart'; // Para Storage y AppwriteConstants
-import 'package:distincia_carros/core/constants/appwrite_constants.dart'; // Para AppwriteConstants
+import 'package:distincia_carros/core/config/app_config.dart';
+import 'package:distincia_carros/core/constants/appwrite_constants.dart'; 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-// Asegúrate que LatLng sea el de latlong2 si es lo que usa flutter_map
-import 'package:latlong2/latlong.dart' as latlong2; // O el tipo que estés usando consistentemente
-import 'package:image_picker/image_picker.dart'; // Para image_picker
-import 'package:appwrite/appwrite.dart' as AppwriteSDK; // Para ID y InputFile
+import 'package:latlong2/latlong.dart' as latlong2; 
+import 'package:image_picker/image_picker.dart'; 
+import 'package:appwrite/appwrite.dart' as AppwriteSDK; 
 
 
 class TripController extends GetxController {
   final TripRepository _tripRepository = TripRepository();
   final AuthController _authController = Get.find<AuthController>();
-  final AppwriteSDK.Storage _storage = AppwriteSDK.Storage(AppConfig.client); // Instancia de Storage
+  final AppwriteSDK.Storage _storage = AppwriteSDK.Storage(AppConfig.client); 
 
   RxList<Trip> userTrips = <Trip>[].obs;
   RxBool isLoading = false.obs;
   RxString errorMessage = ''.obs;
 
-  // --- Para el formulario de creación de Recorrido ---
   final formKeyCreateTrip = GlobalKey<FormState>();
   TextEditingController vehicleBrandController = TextEditingController();
   TextEditingController vehicleModelController = TextEditingController();
   TextEditingController vehicleYearController = TextEditingController();
   TextEditingController tripDescriptionController = TextEditingController();
   TextEditingController tripTitleController = TextEditingController();
-  Rx<File?> pickedVehicleImageFile = Rx<File?>(null); // Para la imagen del vehículo seleccionada
+  Rx<File?> pickedVehicleImageFile = Rx<File?>(null);
 
-  // --- Para la página del mapa ---
-  // Asegúrate que el tipo de LatLng sea consistente con flutter_map (latlong2.LatLng)
   Rx<latlong2.LatLng?> startPoint = Rx<latlong2.LatLng?>(null);
   Rx<latlong2.LatLng?> endPoint = Rx<latlong2.LatLng?>(null);
   RxList<latlong2.LatLng> waypoints = <latlong2.LatLng>[].obs;
   RxDouble calculatedDistanceKm = 0.0.obs;
   RxList<Map<String, double>> polylinePointsForDB = <Map<String, double>>[].obs;
 
-  // ... (métodos onInit y fetchUserTrips sin cambios)
     @override
   void onInit() {
     super.onInit();
@@ -76,14 +70,13 @@ class TripController extends GetxController {
     }
   }
 
-
   Future<void> pickVehicleImage(ImageSource source) async {
     try {
       final ImagePicker picker = ImagePicker();
       final XFile? image = await picker.pickImage(
         source: source,
-        imageQuality: 70, // Comprimir un poco
-        maxWidth: 1024,   // Reducir dimensiones si es muy grande
+        imageQuality: 70,
+        maxWidth: 1024,   
       );
       if (image != null) {
         pickedVehicleImageFile.value = File(image.path);
@@ -97,14 +90,14 @@ class TripController extends GetxController {
     if (userId.isEmpty) return null;
     try {
       final uploadedFile = await _storage.createFile(
-        bucketId: AppwriteConstants.profileImagesBucketId, // Usando el mismo bucket
+        bucketId: AppwriteConstants.profileImagesBucketId,
         fileId: AppwriteSDK.ID.unique(),
         file: AppwriteSDK.InputFile.fromPath(
           path: imageFile.path,
           filename: imageFile.path.split('/').last,
         ),
         permissions: [
-          AppwriteSDK.Permission.read(AppwriteSDK.Role.any()), // Para URL pública
+          AppwriteSDK.Permission.read(AppwriteSDK.Role.any()), 
           AppwriteSDK.Permission.update(AppwriteSDK.Role.user(userId)),
           AppwriteSDK.Permission.delete(AppwriteSDK.Role.user(userId)),
         ],
@@ -135,35 +128,27 @@ class TripController extends GetxController {
       Get.snackbar('Error de Mapa', 'Define inicio y fin en el mapa.');
       return;
     }
-    // No es estrictamente necesario que la distancia sea > 0 si el usuario puede querer registrar un punto.
-    // if (calculatedDistanceKm.value <= 0) {
-    //   Get.snackbar('Error de Mapa', 'La distancia debe ser mayor a cero.');
-    //   return;
-    // }
-
     isLoading.value = true;
     errorMessage.value = '';
 
     String? vehicleImgUrl;
     String? vehicleImgFileId;
 
-    // Subir imagen del vehículo si se seleccionó una
     if (pickedVehicleImageFile.value != null) {
       final uploadResult = await _uploadVehicleImage(userId, pickedVehicleImageFile.value!);
       if (uploadResult != null) {
         vehicleImgUrl = uploadResult['url'];
         vehicleImgFileId = uploadResult['fileId'];
       } else {
-        // Falló la subida de imagen, ¿continuar sin imagen o detener?
         isLoading.value = false;
         Get.snackbar('Error', 'Falló la subida de la imagen del vehículo. Intenta de nuevo.');
-        return; // Detener si la imagen es crucial o si hubo un error de subida
+        return; 
       }
     }
 
     try {
       Trip newTrip = Trip(
-        id: '', // Appwrite lo generará
+        id: '',
         userId: userId,
         vehicleBrand: vehicleBrandController.text.trim(),
         vehicleModel: vehicleModelController.text.trim(),
@@ -179,7 +164,7 @@ class TripController extends GetxController {
         endLatitude: endPoint.value!.latitude,
         endLongitude: endPoint.value!.longitude,
         waypoints: waypoints.map((p) => {'lat': p.latitude, 'lng': p.longitude}).toList(),
-        polylinePointsForDB: polylinePointsForDB.toList(), // Asegúrate que esto se llene en MapRoutePage
+        polylinePointsForDB: polylinePointsForDB.toList(),
         distanceKm: calculatedDistanceKm.value,
         createdAt: DateTime.now(),
       );
@@ -210,7 +195,7 @@ class TripController extends GetxController {
     vehicleYearController.clear();
     tripDescriptionController.clear();
     tripTitleController.clear();
-    pickedVehicleImageFile.value = null; // Limpiar imagen seleccionada
+    pickedVehicleImageFile.value = null;
     startPoint.value = null;
     endPoint.value = null;
     waypoints.clear();
@@ -218,7 +203,6 @@ class TripController extends GetxController {
     calculatedDistanceKm.value = 0.0;
   }
 
-  // ... (método deleteTrip sin cambios)
   Future<void> deleteTrip(String tripId) async {
     bool confirmDelete = await Get.dialog(
       AlertDialog(
@@ -251,12 +235,3 @@ class TripController extends GetxController {
     }
   }
 }
-
-// HomePageController ya está definido en su propio bloque o archivo.
-// Si no, descomenta y ajusta:
-// class HomePageController extends GetxController {
-//   var tabIndex = 0.obs;
-//   void changeTabIndex(int index) {
-//     tabIndex.value = index;
-//   }
-// }

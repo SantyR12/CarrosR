@@ -1,13 +1,10 @@
-// lib/presentation/pages/edit_profile_page.dart
-import 'dart:io'; // Para File
 import 'package:distincia_carros/controller/profile_controller.dart';
 import 'package:distincia_carros/data/models/user_profile_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart'; // Para ImageSource
-
+import 'package:image_picker/image_picker.dart'; 
 class EditProfilePage extends StatefulWidget {
-  final UserProfile currentProfile; // Pasamos el perfil actual
+  final UserProfile currentProfile; 
 
   const EditProfilePage({super.key, required this.currentProfile});
 
@@ -20,19 +17,15 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
 
   late TextEditingController _nameController;
-  late TextEditingController _emailController; // Email no es editable usualmente
+  late TextEditingController _emailController; 
   late TextEditingController _phoneController;
   
-  // No necesitamos un File local aquí si el `profileController.pickedImageFile` se usa para la previsualización.
-
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.currentProfile.name);
     _emailController = TextEditingController(text: widget.currentProfile.email);
     _phoneController = TextEditingController(text: widget.currentProfile.phone ?? '');
-    // Si ProfilePage ya actualizó pickedImageFile en el controller, se usará.
-    // Si no, y el usuario selecciona una imagen aquí, se actualizará en el controller.
   }
 
   @override
@@ -40,28 +33,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
-    // No limpiar profileController.pickedImageFile aquí,
-    // podría ser necesario si el usuario navega atrás y vuelve.
-    // Se limpia después de guardar exitosamente.
     super.dispose();
   }
 
   Future<void> _handleSaveProfile() async {
     if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save(); // Para onSaved si los usas
-      FocusScope.of(context).unfocus(); // Ocultar teclado
+      _formKey.currentState!.save(); 
+      FocusScope.of(context).unfocus(); 
 
-      // Los datos y la imagen (si pickedImageFile tiene valor) se toman del controlador
       await profileController.updateUserProfileData(
         name: _nameController.text.trim(),
         phone: _phoneController.text.trim().isNotEmpty ? _phoneController.text.trim() : null,
-        // El ProfileController usará su `pickedImageFile.value` si existe.
       );
-
-      // El controlador maneja los snackbars de éxito/error.
-      // Si no hay error, significa que se guardó (o al menos se intentó sin excepción).
       if (profileController.errorMessage.value.isEmpty) {
-        Get.back(); // Volver a la página de perfil
+        Get.back();
       }
     }
   }
@@ -108,7 +93,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new),
           onPressed: () {
-            // Si hay una imagen seleccionada pero no guardada, preguntar
             if (profileController.pickedImageFile.value != null) {
               Get.dialog(
                 AlertDialog(
@@ -117,9 +101,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   actions: [
                     TextButton(onPressed: () => Get.back(), child: Text("Continuar Editando")),
                     TextButton(onPressed: (){
-                       profileController.pickedImageFile.value = null; // Limpiar la selección
-                       Get.back(); // Cerrar dialogo
-                       Get.back(); // Volver a la página anterior
+                      profileController.pickedImageFile.value = null; 
+                      Get.back();
+                      Get.back(); 
                     }, child: Text("Descartar y Salir", style: TextStyle(color: Colors.orange[800]))),
                   ],
                 )
@@ -155,7 +139,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               Center(
                 child: GestureDetector(
                   onTap: () => _showImagePickerOptions(context),
-                  child: Obx(() { // Reaccionar a cambios en pickedImageFile
+                  child: Obx(() { 
                     ImageProvider<Object>? backgroundImage;
                     if (profileController.pickedImageFile.value != null) {
                       backgroundImage = FileImage(profileController.pickedImageFile.value!);
@@ -169,11 +153,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       backgroundImage: backgroundImage,
                       onBackgroundImageError: backgroundImage is NetworkImage ? (exception, stackTrace) {
                         print("Error cargando imagen de red en EditProfile: $exception");
-                        // No hacer nada aquí, el child se mostrará si backgroundImage es null
                       } : null,
                       child: backgroundImage == null
                           ? Icon(Icons.person_add_alt_1_outlined, size: 70, color: Colors.grey[500])
-                          : null, // No mostrar icono si hay imagen
+                          : null, 
                     );
                   }),
                 ),
@@ -207,7 +190,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   filled: true,
                   fillColor: Colors.grey[100],
                 ),
-                enabled: false, // El email generalmente no se cambia desde el perfil
+                enabled: false, 
                 style: TextStyle(color: Colors.grey[700]),
               ),
               const SizedBox(height: 20),
@@ -220,12 +203,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
                 ),
                 keyboardType: TextInputType.phone,
-                // Puedes añadir validadores si es necesario, ej. para formato de teléfono
               ),
               const SizedBox(height: 40),
               Obx(() => ElevatedButton.icon(
                   icon: profileController.isLoading.value 
-                      ? const SizedBox.shrink() // No mostrar icono si está cargando
+                      ? const SizedBox.shrink() 
                       : const Icon(Icons.check_circle_outline),
                   label: profileController.isLoading.value
                       ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))

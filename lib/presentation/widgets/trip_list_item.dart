@@ -1,7 +1,6 @@
-// lib/presentation/widgets/trip_list_item.dart
 import 'package:distincia_carros/data/models/trip_model.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Añadir `intl: ^0.19.0` o similar a pubspec.yaml
+import 'package:intl/intl.dart'; 
 
 class TripListItem extends StatelessWidget {
   final Trip trip;
@@ -29,21 +28,10 @@ class TripListItem extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Izquierda: Icono o Miniatura del mapa (Placeholder por ahora)
               Container(
                 width: 70,
                 height: 70,
                 decoration: BoxDecoration(
-                  // Si tienes thumbnailUrl y es una URL válida:
-                  // image: trip.mapThumbnailUrl != null && trip.mapThumbnailUrl!.isNotEmpty
-                  //     ? DecorationImage(
-                  //         image: NetworkImage(trip.mapThumbnailUrl!),
-                  //         fit: BoxFit.cover,
-                  //         onError: (error, stackTrace) {
-                  //            print("Error cargando thumbnail: $error");
-                  //         },
-                  //       )
-                  //     : null,
                   color: trip.mapThumbnailUrl == null || trip.mapThumbnailUrl!.isEmpty
                       ? Theme.of(context).primaryColor.withOpacity(0.1)
                       : null,
@@ -51,10 +39,9 @@ class TripListItem extends StatelessWidget {
                 ),
                 child: trip.mapThumbnailUrl == null || trip.mapThumbnailUrl!.isEmpty
                     ? Icon(Icons.route_outlined, size: 35, color: Theme.of(context).primaryColor)
-                    : null, // El DecorationImage se encargará si hay URL
+                    : null, 
               ),
               const SizedBox(width: 12),
-              // Centro: Información del recorrido
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,22 +67,20 @@ class TripListItem extends StatelessWidget {
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      // Formato de fecha más conciso
                       DateFormat('dd MMM, yyyy').format(trip.createdAt.toLocal()),
                       style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                   ],
                 ),
               ),
-              // Derecha: Botón de eliminar
               SizedBox(
-                width: 40, // Para asegurar que el botón tenga espacio
+                width: 40, 
                 child: IconButton(
                   icon: Icon(Icons.delete_sweep_outlined, color: Colors.redAccent[200]),
                   onPressed: onDelete,
                   tooltip: 'Eliminar recorrido',
-                  padding: EdgeInsets.zero, // Ajustar padding si es necesario
-                  constraints: BoxConstraints(), // Ajustar constraints si es necesario
+                  padding: EdgeInsets.zero,
+                  constraints: BoxConstraints(), 
                 ),
               ),
             ],

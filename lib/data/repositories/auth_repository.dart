@@ -1,7 +1,4 @@
-
-
 import 'package:appwrite/appwrite.dart';
-
 class AuthRepository {
   final Account account;
 

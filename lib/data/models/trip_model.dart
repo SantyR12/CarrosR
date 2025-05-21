@@ -1,8 +1,4 @@
-// lib/data/models/trip_model.dart
 import 'dart:convert';
-// Quita la importación de flutter_map si no la usas directamente aquí.
-// import 'package:flutter_map/flutter_map.dart'; // Si almacenas LatLng directamente
-
 class Trip {
   final String id;
   final String userId;
@@ -11,14 +7,10 @@ class Trip {
   int vehicleYear;
   String tripDescription;
   String tripTitle;
-
-  // Campos para la imagen del vehículo
   String? vehicleImageUrl;
   String? vehicleImageFileId;
-
-  String? mapThumbnailUrl; // Para miniatura del mapa (opcional)
-  String? mapImageFileId;  // Para imagen estática del mapa (opcional)
-
+  String? mapThumbnailUrl; 
+  String? mapImageFileId;  
   double startLatitude;
   double startLongitude;
   double endLatitude;
@@ -36,8 +28,8 @@ class Trip {
     required this.vehicleYear,
     required this.tripDescription,
     required this.tripTitle,
-    this.vehicleImageUrl,     // Añadir al constructor
-    this.vehicleImageFileId,  // Añadir al constructor
+    this.vehicleImageUrl,    
+    this.vehicleImageFileId,  
     this.mapThumbnailUrl,
     this.mapImageFileId,
     required this.startLatitude,
@@ -51,7 +43,6 @@ class Trip {
   });
 
   factory Trip.fromMap(Map<String, dynamic> map) {
-    // ... (lógica existente de parsedWaypoints y parsedPolylinePoints)
     List<Map<String, double>> parsedWaypoints = [];
     if (map['waypoints'] != null) {
         if (map['waypoints'] is String && (map['waypoints'] as String).isNotEmpty) {
@@ -86,7 +77,7 @@ class Trip {
           print('Error decodificando polylinePointsForDB (String JSON): $e');
         }
       } else if (map['polylinePointsForDB'] is List) {
-         try {
+        try {
             parsedPolylinePoints = (map['polylinePointsForDB'] as List)
               .map((p) => Map<String, double>.from(p as Map))
               .toList();
@@ -106,8 +97,8 @@ class Trip {
           : (map['vehicleYear'] ?? DateTime.now().year),
       tripDescription: map['tripDescription'] ?? '',
       tripTitle: map['tripTitle'] ?? 'Recorrido sin título',
-      vehicleImageUrl: map['vehicleImageUrl'],         // Cargar
-      vehicleImageFileId: map['vehicleImageFileId'],   // Cargar
+      vehicleImageUrl: map['vehicleImageUrl'],         
+      vehicleImageFileId: map['vehicleImageFileId'],   
       mapThumbnailUrl: map['mapThumbnailUrl'],
       mapImageFileId: map['mapImageFileId'],
       startLatitude: (map['startLatitude'] as num? ?? 0.0).toDouble(),
@@ -131,8 +122,8 @@ class Trip {
       'vehicleYear': vehicleYear,
       'tripDescription': tripDescription,
       'tripTitle': tripTitle,
-      if (vehicleImageUrl != null) 'vehicleImageUrl': vehicleImageUrl,         // Guardar
-      if (vehicleImageFileId != null) 'vehicleImageFileId': vehicleImageFileId, // Guardar
+      if (vehicleImageUrl != null) 'vehicleImageUrl': vehicleImageUrl,         
+      if (vehicleImageFileId != null) 'vehicleImageFileId': vehicleImageFileId, 
       if (mapThumbnailUrl != null) 'mapThumbnailUrl': mapThumbnailUrl,
       if (mapImageFileId != null) 'mapImageFileId': mapImageFileId,
       'startLatitude': startLatitude,
@@ -142,7 +133,6 @@ class Trip {
       'waypoints': jsonEncode(waypoints),
       if (polylinePointsForDB != null) 'polylinePointsForDB': jsonEncode(polylinePointsForDB),
       'distanceKm': distanceKm,
-      // Appwrite maneja $createdAt y $updatedAt automáticamente
     };
   }
 }

@@ -12,6 +12,6 @@ class AppConfig {
   static Client get client => _client;
   static Account get account => Account(_client);
   static Databases get databases =>
-      Databases(_client); // No pasar databaseId aquí
-  // Puedes agregar inicializaciones para otros servicios
+      Databases(_client); 
+
 }

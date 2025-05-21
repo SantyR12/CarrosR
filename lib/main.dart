@@ -5,38 +5,27 @@ import 'package:distincia_carros/data/repositories/auth_repository.dart';
 import 'package:distincia_carros/presentation/pages/home_page.dart';
 import 'package:distincia_carros/presentation/pages/login_page.dart';
 import 'package:distincia_carros/presentation/pages/register_page.dart';
-import 'package:flutter/material.dart'; // Para localización de fechas
+import 'package:flutter/material.dart'; 
 import 'package:get/get.dart';
 import 'package:distincia_carros/core/config/app_config.dart';
 import 'package:distincia_carros/controller/profile_controller.dart';
-import 'package:distincia_carros/controller/trip_controller.dart'; // Asegúrate que este también se importa
+import 'package:distincia_carros/controller/trip_controller.dart'; 
 import 'package:flutter_localizations/flutter_localizations.dart';
-// Importar HomePageController
-import 'package:distincia_carros/controller/trip_controller.dart'; // Ya está, pero si lo moviste a otro archivo
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Configuración de Appwrite (ya la tienes)
   final account = AppConfig.account;
   final authRepository = AuthRepository(account);
 
-  // Inyectar controladores principales con GetX
-  // Es importante el orden si uno depende de otro en su `onInit`
   Get.put(AuthController(authRepository));
-  Get.put(ProfileController());   // ProfileController ahora depende de AuthController vía Get.find()
-  Get.put(TripController());      // TripController también depende de AuthController vía Get.find()
-  Get.put(HomePageController());  // Inyectar el controlador para el BottomNavBar de HomePage
+  Get.put(ProfileController());   
+  Get.put(TripController());     
+  Get.put(HomePageController());  
 
   final authController = Get.find<AuthController>();
-  // `checkAuth` ahora se llama en el constructor de AuthController o en un _initialize
-  // y actualiza `appwriteUser`. Esperamos a que termine la inicialización.
-  await authController.checkAuth(); // Si tienes un Future en AuthController para esto
+  await authController.checkAuth(); 
 
   bool isLoggedIn = authController.appwriteUser.value != null;
-
-  // Si está logueado, los controladores de Profile y Trip ya tienen lógica en su `onInit`
-  // (o a través de `ever` en AuthController) para cargar datos.
 
   runApp(
     GetMaterialApp(
@@ -47,17 +36,13 @@ void main() async {
         GetPage(name: '/login', page: () => LoginPage()),
         GetPage(name: '/register', page: () => RegisterPage()),
         GetPage(name: '/home', page: () => HomePage()),
-        // No necesitas definir rutas para las páginas internas si navegas
-        // con Get.to(() => NombrePagina()), lo cual es más simple para este caso.
-      ],
-      // Configuración de Tema (Ejemplo)
+        ],
       theme: ThemeData(
-        primarySwatch: Colors.teal, // Color principal
-        // primaryColor: Colors.teal[600], // Un tono específico
-        scaffoldBackgroundColor: Colors.grey[50], // Fondo general
+        primarySwatch: Colors.teal, 
+        scaffoldBackgroundColor: Colors.grey[50],
         appBarTheme: AppBarTheme(
           backgroundColor: Colors.teal[700],
-          foregroundColor: Colors.white, // Color del texto y los iconos en AppBar
+          foregroundColor: Colors.white, 
           elevation: 2,
           titleTextStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
         ),
@@ -106,20 +91,12 @@ void main() async {
           backgroundColor: Colors.orange[700],
           foregroundColor: Colors.white,
         ),
-        // ... más personalizaciones de tema
       ),
-      // Para la localización de fechas (ej. DateFormat en TripDetailsPage)
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
+    supportedLocales: const [
+        Locale('es', 'CO'), 
+        Locale('en', 'US'), 
       ],
-      supportedLocales: const [
-        Locale('es', 'CO'), // Español de Colombia
-        Locale('en', 'US'), // Inglés como fallback o alternativa
-        // ... otros locales que soportes
-      ],
-      locale: const Locale('es', 'CO'), // Establecer el locale por defecto
+      locale: const Locale('es', 'CO'), 
     ),
   );
 }
