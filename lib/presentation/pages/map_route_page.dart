@@ -5,12 +5,12 @@ import 'package:distincia_carros/controller/trip_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart' as latlong;
+import 'package:latlong2/latlong.dart' as latlong; // Usar con prefijo para claridad
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 
 const String MAPTILER_API_KEY = "IMdKNAWagDsTUpy68b5d"; // Tu clave de MapTiler
-const String OPENROUTESERVICE_API_KEY = "5b3ce3597851110001cf62487ad07cff861e4c0395e2435796b91946"; // <-- ¡REEMPLAZA CON TU CLAVE REAL DE ORS!
+const String OPENROUTESERVICE_API_KEY = "5b3ce3597851110001cf62484b05b43d095541ed9a40e378ca759ad5"; // <-- ¡REEMPLAZA CON TU CLAVE REAL DE ORS!
 
 class MapRoutePage extends StatefulWidget {
   const MapRoutePage({super.key});
@@ -42,70 +42,114 @@ class _MapRoutePageState extends State<MapRoutePage> {
   }
 
   void _prepareInitialMapState() {
-    // ... (código sin cambios respecto a tu última versión)
     List<Marker> initialMarkers = [];
     bool shouldCenterMap = false;
+
+    // Asumimos que TripController usa latlong.LatLng para startPoint y endPoint.
     final latlong.LatLng? startP = tripController.startPoint.value;
     final latlong.LatLng? endP = tripController.endPoint.value;
 
     if (startP != null) {
-      initialMarkers.add(Marker(width: 80.0, height: 80.0, point: startP, child: Tooltip(message: "Inicio", child: Icon(Icons.location_pin, color: Colors.green[700], size: 40)),));
+      initialMarkers.add(
+        Marker(
+          width: 80.0, height: 80.0,
+          point: startP,
+          child: Tooltip(message: "Inicio", child: Icon(Icons.location_pin, color: Colors.green[700], size: 40)),
+        ),
+      );
       _isSettingStartPoint = false;
       shouldCenterMap = true;
     }
     if (endP != null) {
-      initialMarkers.add(Marker(width: 80.0, height: 80.0, point: endP, child: Tooltip(message: "Fin", child: Icon(Icons.location_pin, color: Colors.red[700], size: 40)),));
+      initialMarkers.add(
+        Marker(
+          width: 80.0, height: 80.0,
+          point: endP,
+          child: Tooltip(message: "Fin", child: Icon(Icons.location_pin, color: Colors.red[700], size: 40)),
+        ),
+      );
       shouldCenterMap = true;
     }
-    if (mounted) { setState(() { _markers = initialMarkers; });}
+    
+    if (mounted) {
+      setState(() {
+        _markers = initialMarkers;
+      });
+    }
+
     if (startP != null && endP != null) {
       _drawRouteWithORS();
     } else if (shouldCenterMap && initialMarkers.isNotEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_isMapReady && initialMarkers.isNotEmpty && mounted) {
-          _mapController.move(initialMarkers.first.point, 14.0);
-        }
-      });
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (_isMapReady && initialMarkers.isNotEmpty && mounted) {
+                _mapController.move(initialMarkers.first.point, 14.0);
+            }
+        });
     }
   }
 
   Future<void> _requestLocationPermissionAndMoveCamera() async {
-    // ... (código sin cambios respecto a tu última versión)
     if (!_isMapReady || !mounted) return;
+
     bool serviceEnabled;
     LocationPermission permission;
+
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) { Get.snackbar('Ubicación Deshabilitada', 'Por favor, activa los servicios de ubicación.', snackPosition: SnackPosition.BOTTOM); return;}
+    if (!serviceEnabled) {
+      Get.snackbar('Ubicación Deshabilitada', 'Por favor, activa los servicios de ubicación.', snackPosition: SnackPosition.BOTTOM);
+      return;
+    }
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) { Get.snackbar('Permiso Denegado', 'No se concedió el permiso de ubicación.', snackPosition: SnackPosition.BOTTOM); return;}
+      if (permission == LocationPermission.denied) {
+        Get.snackbar('Permiso Denegado', 'No se concedió el permiso de ubicación.', snackPosition: SnackPosition.BOTTOM);
+        return;
+      }
     }
-    if (permission == LocationPermission.deniedForever) { Get.snackbar('Permiso Bloqueado', 'El permiso de ubicación está bloqueado. Habilítalo desde la configuración.', snackPosition: SnackPosition.BOTTOM); return;}
+    if (permission == LocationPermission.deniedForever) {
+      Get.snackbar('Permiso Bloqueado', 'El permiso de ubicación está bloqueado. Habilítalo desde la configuración.', snackPosition: SnackPosition.BOTTOM);
+      return;
+    }
     try {
       Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
       final userLocation = latlong.LatLng(position.latitude, position.longitude);
-       if (mounted) { _mapController.move(userLocation, 14.0);}
-    } catch (e) { print("Error obteniendo ubicación actual: $e"); Get.snackbar('Error de Ubicación', 'No se pudo obtener tu ubicación actual.', snackPosition: SnackPosition.BOTTOM);}
+       if (mounted) {
+        _mapController.move(userLocation, 14.0);
+      }
+    } catch (e) {
+      print("Error obteniendo ubicación actual: $e");
+      Get.snackbar('Error de Ubicación', 'No se pudo obtener tu ubicación actual.', snackPosition: SnackPosition.BOTTOM);
+    }
   }
 
   void _onMapTap(TapPosition tapPosition, latlong.LatLng latlng) {
-    // ... (código sin cambios respecto a tu última versión)
     if (!mounted) return;
     setState(() {
       final newPointForMap = latlng;
       List<Marker> updatedMarkers = List.from(_markers);
+
       if (tripController.startPoint.value == null || _isSettingStartPoint) {
         tripController.startPoint.value = newPointForMap;
         updatedMarkers.removeWhere((m) => (m.child as Tooltip).message == "Inicio");
-        updatedMarkers.add(Marker(width: 80.0, height: 80.0, point: newPointForMap, child: Tooltip(message: "Inicio", child: Icon(Icons.location_pin, color: Colors.green[700], size: 40)),));
+        updatedMarkers.add(
+          Marker(
+            width: 80.0, height: 80.0, point: newPointForMap,
+            child: Tooltip(message: "Inicio", child: Icon(Icons.location_pin, color: Colors.green[700], size: 40)),
+          ),
+        );
         _isSettingStartPoint = false;
         _clearRouteAndDistanceUI();
         Get.snackbar("Punto de Inicio", "Marcado. Ahora selecciona el punto final.", duration: Duration(seconds: 2), snackPosition: SnackPosition.TOP);
       } else if (tripController.endPoint.value == null) {
         tripController.endPoint.value = newPointForMap;
         updatedMarkers.removeWhere((m) => (m.child as Tooltip).message == "Fin");
-        updatedMarkers.add(Marker(width: 80.0, height: 80.0, point: newPointForMap, child: Tooltip(message: "Fin", child: Icon(Icons.location_pin, color: Colors.red[700], size: 40)),));
+        updatedMarkers.add(
+          Marker(
+            width: 80.0, height: 80.0, point: newPointForMap,
+            child: Tooltip(message: "Fin", child: Icon(Icons.location_pin, color: Colors.red[700], size: 40)),
+          ),
+        );
         Get.snackbar("Punto Final", "Marcado. Calculando ruta...", duration: Duration(seconds: 2), snackPosition: SnackPosition.TOP);
         _drawRouteWithORS();
       } else {
@@ -119,10 +163,10 @@ class _MapRoutePageState extends State<MapRoutePage> {
     if (tripController.startPoint.value == null || tripController.endPoint.value == null) {
       return;
     }
-    if (OPENROUTESERVICE_API_KEY == "5b3ce3597851110001cf62487ad07cff861e4c0395e2435796b91946") {
+    if (OPENROUTESERVICE_API_KEY == "5b3ce3597851110001cf62484b05b43d095541ed9a40e378ca759ad0") {
         Get.snackbar("API Key Faltante", "Añade tu API Key de OpenRouteService.",
         backgroundColor: Colors.red, colorText: Colors.white, duration: Duration(seconds: 5));
-        _fallbackToStraightLine();
+        _fallbackToStraightLine(); // Intentar al menos dibujar línea recta
         return;
     }
     _showLoadingDialog("Calculando ruta...");
@@ -133,25 +177,9 @@ class _MapRoutePageState extends State<MapRoutePage> {
     var url = Uri.parse(
         'https://api.openrouteservice.org/v2/directions/driving-car?api_key=$OPENROUTESERVICE_API_KEY&start=$startCoords&end=$endCoords&geometry_simplify=true&instructions=false');
 
-    http.Response? response; // Declarar fuera del try para que esté disponible en el catch de TimeoutException
-
     try {
-      response = await http.get(url, headers: {
-        'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8'
-      }).timeout(
-        const Duration(seconds: 25), // <--- TIMEOUT AÑADIDO (25 segundos)
-        onTimeout: () {
-          // Esto se ejecuta si el timeout se alcanza ANTES de que http.get complete.
-          // http.get lanzará un TimeoutException que será capturado abajo.
-          // Devolvemos una respuesta nula o una respuesta de error simulada
-          // para indicar que el timeout ocurrió, aunque el catch lo manejará.
-          // No es estrictamente necesario retornar algo aquí si el catch lo maneja.
-          print("Timeout alcanzado en la llamada a ORS.");
-          return http.Response('Error: Timeout ORS', 408); // Request Timeout
-        },
-      );
-
-      _hideLoadingDialog(); // Ocultar aquí si la respuesta (o timeout) se completó
+      var response = await http.get(url, headers: {'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8'});
+      _hideLoadingDialog();
 
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
@@ -180,52 +208,27 @@ class _MapRoutePageState extends State<MapRoutePage> {
         }
 
       } else {
-        // Si hubo timeout y retornamos una respuesta simulada, el statusCode podría ser 408
-        if (response.statusCode == 408) {
-            // El onTimeout ya debería haber mostrado un snackbar, pero podemos reforzarlo o solo loguear
-            print("Manejando respuesta de Timeout explícita (408).");
-             Get.snackbar(
-              "Tiempo Agotado",
-              "El cálculo de la ruta tardó demasiado. Se muestra una línea recta.",
-              snackPosition: SnackPosition.BOTTOM,
-              backgroundColor: Colors.orange,
-              colorText: Colors.white,
-              duration: const Duration(seconds: 4)
-            );
-        } else {
-            print("Error de OpenRouteService (Status ${response.statusCode}): ${response.body}");
-            Get.snackbar("Error de Ruta ORS", "No se pudo obtener la ruta (${response.statusCode}).", snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.orange);
-        }
+        print("Error de OpenRouteService (Status ${response.statusCode}): ${response.body}");
+        Get.snackbar("Error de Ruta ORS", "No se pudo obtener la ruta (${response.statusCode}). Revisa API Key/cuotas de ORS.", snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.orange);
         _fallbackToStraightLine();
       }
-    } on TimeoutException catch (_) { // Capturar específicamente TimeoutException
-        _hideLoadingDialog();
-        print("TimeoutException capturada al llamar a ORS.");
-        Get.snackbar(
-            "Tiempo Agotado",
-            "El cálculo de la ruta tardó demasiado. Se muestra una línea recta.",
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.orange[800], // Un color diferente para distinguirlo
-            colorText: Colors.white,
-            duration: const Duration(seconds: 4)
-        );
-        _fallbackToStraightLine();
-    } 
-    catch (e) { // Capturar otros errores (SocketException, FormatException, etc.)
+    } catch (e) {
       _hideLoadingDialog();
-      print("Excepción general al llamar a ORS o procesar: $e");
-      Get.snackbar("Error de Conexión", "No se pudo conectar al servicio de rutas. Verifica tu conexión.", snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+      print("Excepción al llamar a ORS: $e");
+      Get.snackbar("Error de Conexión ORS", "No se pudo conectar al servicio de rutas.", snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
        _fallbackToStraightLine();
     }
   }
 
   void _fallbackToStraightLine() {
-    // ... (código sin cambios)
     if (tripController.startPoint.value != null && tripController.endPoint.value != null) {
       final p1 = tripController.startPoint.value!;
       final p2 = tripController.endPoint.value!;
+      
       if (mounted) {
-          setState(() { _currentRoutePoints = [p1, p2]; });
+          setState(() {
+            _currentRoutePoints = [p1, p2];
+          });
           tripController.polylinePointsForDB.clear();
           _currentRoutePoints.forEach((p) => tripController.polylinePointsForDB.add({'lat': p.latitude, 'lng': p.longitude}));
           _calculateDistanceBetweenTwoPoints(p1, p2);
@@ -237,77 +240,214 @@ class _MapRoutePageState extends State<MapRoutePage> {
   }
 
   void _calculateDistanceBetweenTwoPoints(latlong.LatLng p1, latlong.LatLng p2) {
-    // ... (código sin cambios)
-     double distance = Geolocator.distanceBetween(p1.latitude, p1.longitude, p2.latitude, p2.longitude);
+     double distance = Geolocator.distanceBetween(
+        p1.latitude, p1.longitude,
+        p2.latitude, p2.longitude
+     );
      tripController.calculatedDistanceKm.value = distance / 1000;
   }
 
   void _clearRouteAndDistanceUI() {
-    // ... (código sin cambios)
-     if (mounted) { setState(() { _currentRoutePoints.clear(); });}
+     if (mounted) {
+        setState(() {
+            _currentRoutePoints.clear();
+        });
+     }
      tripController.calculatedDistanceKm.value = 0.0;
      tripController.polylinePointsForDB.clear();
   }
 
   void _clearMapAndSelection() {
-    // ... (código sin cambios)
     if (mounted) {
         setState(() {
-        _markers.clear(); _currentRoutePoints.clear();
-        tripController.startPoint.value = null; tripController.endPoint.value = null;
-        tripController.waypoints.clear(); tripController.calculatedDistanceKm.value = 0.0;
-        tripController.polylinePointsForDB.clear(); _isSettingStartPoint = true;
+        _markers.clear();
+        _currentRoutePoints.clear();
+        tripController.startPoint.value = null;
+        tripController.endPoint.value = null;
+        tripController.waypoints.clear();
+        tripController.calculatedDistanceKm.value = 0.0;
+        tripController.polylinePointsForDB.clear();
+        _isSettingStartPoint = true;
         });
     }
     Get.snackbar("Mapa Limpio", "Selecciona un nuevo punto de inicio.", snackPosition: SnackPosition.TOP);
   }
 
   void _centerMapOnCurrentPoints() {
-    // ... (código sin cambios, ya lo corregimos antes)
-    if (!_isMapReady || !mounted) { print("MapController no está listo o widget no montado (en _centerMapOnCurrentPoints)."); return; }
+    if (!_isMapReady || !mounted) {
+        print("MapController no está listo o widget no montado (en _centerMapOnCurrentPoints).");
+        return;
+    }
+
     List<latlong.LatLng> pointsToBound = [];
     if (_markers.isNotEmpty) _markers.forEach((m) => pointsToBound.add(m.point));
-    if (_currentRoutePoints.isNotEmpty) pointsToBound.addAll(_currentRoutePoints);
+    if (_currentRoutePoints.isNotEmpty) {
+        pointsToBound.addAll(_currentRoutePoints);
+    }
+    
     if (pointsToBound.isNotEmpty) {
+        // Usar LatLngBounds de flutter_map (que es en realidad latlong.LatLngBounds)
         var calculatedBounds = LatLngBounds.fromPoints(pointsToBound);
+
+        // Un LatLngBounds es "válido" si puede definir una esquina suroeste y noreste.
+        // fromPoints() debería manejar la creación de un bound válido si hay al menos un punto.
+        // La principal condición es que calculatedBounds no sea nulo (lo cual fromPoints asegura si la lista no está vacía)
+        // y que las coordenadas no sean NaN o infinitas (poco probable con LatLng).
+        // Una forma simple de chequear si es más que un punto:
         bool isArea = calculatedBounds.southEast != calculatedBounds.northWest;
-        if (isArea || pointsToBound.length > 1) {
-             _mapController.fitCamera(CameraFit.bounds(bounds: calculatedBounds, padding: const EdgeInsets.all(50.0)));
-        } else if (pointsToBound.length == 1) {
-            _mapController.move(pointsToBound.first, 15.0);
-        } else { print("Bounds no válidos o insuficientes para centrar. Centrando en _initialCenter."); _mapController.move(_initialCenter, _initialZoom); }
-    } else { print("No hay puntos para crear bounds para fitCamera. Centrando en _initialCenter."); _mapController.move(_initialCenter, _initialZoom);}
+
+
+        if (isArea || pointsToBound.length > 1) { // Si es un área o más de un punto (para que fitCamera tenga sentido)
+             _mapController.fitCamera(
+                CameraFit.bounds(
+                    bounds: calculatedBounds, 
+                    padding: const EdgeInsets.all(50.0) 
+                )
+            );
+        } else if (pointsToBound.length == 1) { // Si solo hay un punto
+            _mapController.move(pointsToBound.first, 15.0); // Zoom a ese único punto
+        } else {
+            print("Bounds no válidos o insuficientes para centrar el mapa. Centrando en _initialCenter.");
+            _mapController.move(_initialCenter, _initialZoom);
+        }
+    } else {
+        print("No hay puntos para crear bounds para fitCamera. Centrando en _initialCenter.");
+        _mapController.move(_initialCenter, _initialZoom);
+    }
   }
 
   void _showLoadingDialog(String message) {
-    // ... (código sin cambios)
     if (!(Get.isDialogOpen ?? false)) {
-      Get.dialog( AlertDialog( content: Row(children: [const CircularProgressIndicator(), const SizedBox(width: 15), Text(message)]),), barrierDismissible: false,);
+      Get.dialog(
+        AlertDialog(
+          content: Row(children: [const CircularProgressIndicator(), const SizedBox(width: 15), Text(message)]),
+        ),
+        barrierDismissible: false,
+      );
     }
   }
 
   void _hideLoadingDialog() {
-    // ... (código sin cambios)
-    if (Get.isDialogOpen ?? false) { Get.back();}
+    if (Get.isDialogOpen ?? false) {
+      Get.back();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // ... (código sin cambios respecto a tu última versión)
     return Scaffold(
-      appBar: AppBar( title: const Text('Definir Ruta'), actions: [ IconButton( icon: const Icon(Icons.refresh_outlined), tooltip: "Limpiar Mapa", onPressed: _clearMapAndSelection,),],),
+      appBar: AppBar(
+        title: const Text('Definir Ruta'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh_outlined),
+            tooltip: "Limpiar Mapa",
+            onPressed: _clearMapAndSelection,
+          ),
+        ],
+      ),
       body: Stack(
         children: [
-          FlutterMap( mapController: _mapController, options: MapOptions( initialCenter: _initialCenter, initialZoom: _initialZoom, onTap: _onMapTap, onMapReady: () { if (mounted) { setState(() { _isMapReady = true; }); print("flutter_map está listo!"); _initializeMapRelatedData();}},),
+          FlutterMap(
+            mapController: _mapController,
+            options: MapOptions(
+              initialCenter: _initialCenter,
+              initialZoom: _initialZoom,
+              onTap: _onMapTap,
+              onMapReady: () {
+                if (mounted) {
+                    setState(() {
+                    _isMapReady = true;
+                    });
+                    print("flutter_map está listo!");
+                    _initializeMapRelatedData();
+                }
+              },
+            ),
             children: [
-              TileLayer( urlTemplate: "https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=$MAPTILER_API_KEY", userAgentPackageName: 'com.tuempresa.distincia_carros',),
-              if (_currentRoutePoints.isNotEmpty && _currentRoutePoints.length >= 2) PolylineLayer( polylines: [ Polyline( points: _currentRoutePoints, strokeWidth: 5.0, color: Colors.deepPurpleAccent,),],),
+              TileLayer(
+                urlTemplate: "https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=$MAPTILER_API_KEY",
+                userAgentPackageName: 'com.tuempresa.distincia_carros', // Reemplaza
+              ),
+              // Condicionar la PolylineLayer
+              if (_currentRoutePoints.isNotEmpty && _currentRoutePoints.length >= 2)
+                PolylineLayer(
+                  polylines: [
+                    Polyline(
+                      points: _currentRoutePoints,
+                      strokeWidth: 5.0,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                  ],
+                ),
               MarkerLayer(markers: _markers),
             ],
           ),
-          Positioned( top: 10, left: 10, right: 10, child: Card( elevation: 3, child: Padding( padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0), child: Obx(() => Row( mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [ Text( 'Distancia:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.grey[700]),), Text( '${tripController.calculatedDistanceKm.value.toStringAsFixed(2)} km', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.deepPurple),),],)),),),),
-          Positioned( bottom: 100, left: 16, right: 16, child: TextButton.icon( style: TextButton.styleFrom( backgroundColor: Colors.white.withOpacity(0.95), foregroundColor: Colors.blueGrey[800], padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: BorderSide(color: Colors.grey[350]!))), icon: Icon(_isSettingStartPoint && tripController.startPoint.value == null ? Icons.touch_app_outlined : (_isSettingStartPoint ? Icons.gps_fixed : Icons.gps_not_fixed_outlined), size: 20), label: Text( _isSettingStartPoint ? (tripController.startPoint.value == null ? "Toca el mapa para marcar INICIO" : "Toca el mapa para marcar FIN") : (tripController.endPoint.value == null ? "Toca el mapa para marcar FIN" : "Ruta definida. Puedes guardar."), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),), onPressed: () { if(tripController.startPoint.value == null) { if (_isMapReady) _requestLocationPermissionAndMoveCamera();} else if (_markers.isNotEmpty && _isMapReady) { _centerMapOnCurrentPoints();}},),),
-          Positioned( bottom: 20, left: 16, right: 16, child: ElevatedButton.icon( icon: const Icon(Icons.save_alt_outlined), label: const Text('Confirmar Ruta y Guardar'), style: ElevatedButton.styleFrom( padding: const EdgeInsets.symmetric(vertical: 14), textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))), onPressed: () { if (tripController.startPoint.value != null && tripController.endPoint.value != null && tripController.calculatedDistanceKm.value > 0) { tripController.saveNewTrip();} else { Get.snackbar('Ruta Incompleta', 'Define inicio, fin y asegúrate de que la distancia sea calculada.', snackPosition: SnackPosition.BOTTOM);}},),)
+          Positioned(
+            top: 10, left: 10, right: 10,
+            child: Card( 
+                 elevation: 3,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+                child: Obx(() => Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Distancia:',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.grey[700]),
+                    ),
+                     Text(
+                      '${tripController.calculatedDistanceKm.value.toStringAsFixed(2)} km',
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.deepPurple),
+                    ),
+                  ],
+                )),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 100, left: 16, right: 16,
+            child: TextButton.icon( 
+                style: TextButton.styleFrom(
+                backgroundColor: Colors.white.withOpacity(0.95), foregroundColor: Colors.blueGrey[800],
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: BorderSide(color: Colors.grey[350]!))),
+                icon: Icon(_isSettingStartPoint && tripController.startPoint.value == null ? Icons.touch_app_outlined : (_isSettingStartPoint ? Icons.gps_fixed : Icons.gps_not_fixed_outlined), size: 20),
+                label: Text(
+                _isSettingStartPoint
+                    ? (tripController.startPoint.value == null ? "Toca el mapa para marcar INICIO" : "Toca el mapa para marcar FIN")
+                    : (tripController.endPoint.value == null ? "Toca el mapa para marcar FIN" : "Ruta definida. Puedes guardar."),
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+              ),
+              onPressed: () {
+                if(tripController.startPoint.value == null) {
+                    if (_isMapReady) _requestLocationPermissionAndMoveCamera();
+                } else if (_markers.isNotEmpty && _isMapReady) {
+                     _centerMapOnCurrentPoints();
+                }
+              },
+            ),
+          ),
+          Positioned(
+            bottom: 20, left: 16, right: 16,
+            child: ElevatedButton.icon( 
+                icon: const Icon(Icons.save_alt_outlined),
+              label: const Text('Confirmar Ruta y Guardar'),
+              style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+              onPressed: () {
+                if (tripController.startPoint.value != null &&
+                    tripController.endPoint.value != null &&
+                    tripController.calculatedDistanceKm.value > 0) {
+                  tripController.saveNewTrip();
+                } else {
+                  Get.snackbar('Ruta Incompleta', 'Define inicio, fin y asegúrate de que la distancia sea calculada.', snackPosition: SnackPosition.BOTTOM);
+                }
+              },
+            ),
+          )
         ],
       ),
     );
