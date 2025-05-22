@@ -158,13 +158,12 @@ class _MapRoutePageState extends State<MapRoutePage> {
     if (tripController.startPoint.value == null || tripController.endPoint.value == null) {
       return;
     }
-    if (OPENROUTESERVICE_API_KEY == "5b3ce3597851110001cf62484b05b43d095541ed9a40e378ca759ad0") {
+    if (OPENROUTESERVICE_API_KEY == "5b3ce3597851110001cf62484b05b43d095541ed9a40e378ca759ad51") {
         Get.snackbar("API Key Faltante", "Añade tu API Key de OpenRouteService.",
         backgroundColor: Colors.red, colorText: Colors.white, duration: Duration(seconds: 5));
         _fallbackToStraightLine(); 
         return;
     }
-    _showLoadingDialog("Calculando ruta...");
 
     String startCoords = "${tripController.startPoint.value!.longitude},${tripController.startPoint.value!.latitude}";
     String endCoords = "${tripController.endPoint.value!.longitude},${tripController.endPoint.value!.latitude}";

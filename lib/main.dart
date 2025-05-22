@@ -75,7 +75,7 @@ void main() async {
           hintStyle: TextStyle(color: Colors.grey[500]),
           prefixIconColor: Colors.grey[600],
         ),
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           elevation: 1,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
