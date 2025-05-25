@@ -1,3 +1,5 @@
+
+import 'dart:async';
 import 'package:distincia_carros/data/models/trip_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -27,8 +29,8 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
     super.initState();
   }
 
-  void _initializeDetailsMapData(){
-     _buildMapElements();
+  void _initializeDetailsMapData() {
+    _buildMapElements();
   }
 
   void _buildMapElements() {
@@ -38,8 +40,10 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
     final startPoint = latlong.LatLng(widget.trip.startLatitude, widget.trip.startLongitude);
     localMarkers.add(
       Marker(
-        width: 80.0, height: 80.0, point: startPoint,
-        child: Tooltip(message: "Inicio", child: Icon(Icons.location_pin, color: Colors.green[700], size: 40)),
+        width: 80.0,
+        height: 80.0,
+        point: startPoint,
+        child: Tooltip(message: "Inicio", child: Icon(Icons.location_on, color: Colors.green[700], size: 40)),
       ),
     );
     mainTripPoints.add(startPoint);
@@ -49,8 +53,10 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
         final waypoint = latlong.LatLng(wp['lat']!, wp['lng']!);
         localMarkers.add(
           Marker(
-            width: 80.0, height: 80.0, point: waypoint,
-            child: Tooltip(message: "Parada", child: Icon(Icons.location_pin, color: Colors.blue[600], size: 35)),
+            width: 80.0,
+            height: 80.0,
+            point: waypoint,
+            child: Tooltip(message: "Parada", child: Icon(Icons.flag_circle_outlined, color: Colors.blue[600], size: 35)),
           ),
         );
         mainTripPoints.add(waypoint);
@@ -60,14 +66,16 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
     final endPoint = latlong.LatLng(widget.trip.endLatitude, widget.trip.endLongitude);
     localMarkers.add(
       Marker(
-        width: 80.0, height: 80.0, point: endPoint,
-        child: Tooltip(message: "Fin", child: Icon(Icons.location_pin, color: Colors.red[700], size: 40)),
+        width: 80.0,
+        height: 80.0,
+        point: endPoint,
+        child: Tooltip(message: "Fin", child: Icon(Icons.location_on, color: Colors.red[700], size: 40)),
       ),
     );
     mainTripPoints.add(endPoint);
 
     List<Polyline> localPolylines = [];
-    
+
     if (widget.trip.polylinePointsForDB != null && widget.trip.polylinePointsForDB!.isNotEmpty) {
       _routePointsForMapVisual = widget.trip.polylinePointsForDB!
           .map((p) => latlong.LatLng(p['lat']!, p['lng']!))
@@ -80,7 +88,7 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
       localPolylines.add(Polyline(
         points: _routePointsForMapVisual,
         strokeWidth: 5.0,
-        color: Colors.deepPurpleAccent,
+        color: Colors.teal[600]!, 
       ));
     }
 
@@ -100,50 +108,51 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
 
     List<latlong.LatLng> pointsToBound = [];
     if (_routePointsForMapVisual.isNotEmpty) {
-        pointsToBound.addAll(_routePointsForMapVisual);
+      pointsToBound.addAll(_routePointsForMapVisual);
     } else if (_markers.isNotEmpty) {
-        _markers.forEach((m) => pointsToBound.add(m.point));
+      _markers.forEach((m) => pointsToBound.add(m.point));
     }
-    
+
     if (pointsToBound.isNotEmpty) {
-        var calculatedBounds = LatLngBounds.fromPoints(pointsToBound);
+      var calculatedBounds = LatLngBounds.fromPoints(pointsToBound); 
 
-        bool isArea = calculatedBounds.northEast != null && calculatedBounds.southWest != null &&
-            (calculatedBounds.northEast!.latitude != calculatedBounds.southWest!.latitude ||
-             calculatedBounds.northEast!.longitude != calculatedBounds.southWest!.longitude);
+      bool canFitBounds = pointsToBound.length > 1 &&
+                          calculatedBounds.southWest != null &&
+                          calculatedBounds.northEast != null &&
+                          (calculatedBounds.southWest!.latitude != calculatedBounds.northEast!.latitude ||
+                           calculatedBounds.southWest!.longitude != calculatedBounds.northEast!.longitude);
 
-        if (isArea || pointsToBound.length > 1) {
-             _mapController.fitCamera(
-                CameraFit.bounds(
-                    bounds: calculatedBounds,
-                    padding: const EdgeInsets.all(40.0)
-                )
-            );
-        } else if (pointsToBound.length == 1) {
-            _mapController.move(pointsToBound.first, 15.0);
-        } else {
-             print("Bounds no válidos en detalles. Centrando en el punto de inicio del viaje.");
-             _mapController.move(latlong.LatLng(widget.trip.startLatitude, widget.trip.startLongitude), 12.0);
-        }
-    } else {
-        print("No hay puntos para crear bounds en detalles. Centrando en el punto de inicio del viaje.");
+      if (canFitBounds) {
+        _mapController.fitCamera(
+          CameraFit.bounds(
+            bounds: calculatedBounds,
+            padding: const EdgeInsets.all(50.0),
+          ),
+        );
+      } else if (pointsToBound.length == 1) {
+        _mapController.move(pointsToBound.first, 15.0);
+      } else {
+        print("Bounds no válidos en detalles o solo un punto. Centrando en el punto de inicio del viaje.");
         _mapController.move(latlong.LatLng(widget.trip.startLatitude, widget.trip.startLongitude), 12.0);
+      }
+    } else {
+      print("No hay puntos para crear bounds en detalles. Centrando en el punto de inicio del viaje.");
+      _mapController.move(latlong.LatLng(widget.trip.startLatitude, widget.trip.startLongitude), 12.0);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     latlong.LatLng initialMapCenter = latlong.LatLng(widget.trip.startLatitude, widget.trip.startLongitude);
-     if (_markers.isNotEmpty && _routePointsForMapVisual.isEmpty) { 
-        double avgLat = _markers.map((m) => m.point.latitude).reduce((a, b) => a + b) / _markers.length;
-        double avgLng = _markers.map((m) => m.point.longitude).reduce((a, b) => a + b) / _markers.length;
-        initialMapCenter = latlong.LatLng(avgLat, avgLng);
-    } else if (_routePointsForMapVisual.isNotEmpty) { 
-        double avgLat = _routePointsForMapVisual.map((p) => p.latitude).reduce((a,b) => a+b) / _routePointsForMapVisual.length;
-        double avgLng = _routePointsForMapVisual.map((p) => p.longitude).reduce((a,b) => a+b) / _routePointsForMapVisual.length;
-        initialMapCenter = latlong.LatLng(avgLat, avgLng);
+    if (_markers.isNotEmpty && _routePointsForMapVisual.isEmpty) {
+      double avgLat = _markers.map((m) => m.point.latitude).reduce((a, b) => a + b) / _markers.length;
+      double avgLng = _markers.map((m) => m.point.longitude).reduce((a, b) => a + b) / _markers.length;
+      initialMapCenter = latlong.LatLng(avgLat, avgLng);
+    } else if (_routePointsForMapVisual.isNotEmpty) {
+      double avgLat = _routePointsForMapVisual.map((p) => p.latitude).reduce((a,b) => a+b) / _routePointsForMapVisual.length;
+      double avgLng = _routePointsForMapVisual.map((p) => p.longitude).reduce((a,b) => a+b) / _routePointsForMapVisual.length;
+      initialMapCenter = latlong.LatLng(avgLat, avgLng);
     }
-
 
     return Scaffold(
       appBar: AppBar(
@@ -154,20 +163,41 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(0),
+        padding: const EdgeInsets.only(bottom: 20),
         children: <Widget>[
+          if (widget.trip.vehicleImageUrl != null && widget.trip.vehicleImageUrl!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 8.0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12.0),
+                child: FadeInImage.assetNetwork(
+                  placeholder: 'assets/images/placeholder_car.png',
+                  image: widget.trip.vehicleImageUrl!,
+                  height: 200,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  imageErrorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      height: 200,
+                      color: Colors.grey[300], 
+                      child: Center(child: Icon(Icons.broken_image_outlined, size: 50, color: Colors.grey[600])),
+                    );
+                  },
+                ),
+              ),
+            ),
           Container(
-            height: 300,
+            height: 280,
             margin: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Colors.grey.shade300, width: 1),
-               boxShadow: [
+              boxShadow: [
                 BoxShadow(
                   color: Colors.grey.withOpacity(0.2),
                   spreadRadius: 1,
                   blurRadius: 5,
-                  offset: Offset(0, 2),
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
@@ -180,17 +210,17 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
                   initialZoom: 12,
                   onMapReady: () {
                     if (mounted) {
-                        setState(() {
+                      setState(() {
                         _isMapDetailsReady = true;
-                        });
-                        _initializeDetailsMapData();
+                      });
+                      _initializeDetailsMapData();
                     }
                   }
                 ),
                 children: [
                   TileLayer(
                     urlTemplate: "https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=$MAPTILER_API_KEY_DETAILS",
-                    userAgentPackageName: 'com.tuempresa.distincia_carros',
+                    userAgentPackageName: 'com.example.distincia_carros',
                   ),
                   if (_polylines.isNotEmpty && _polylines.first.points.isNotEmpty && _polylines.first.points.length >=2)
                     PolylineLayer(polylines: _polylines),
@@ -201,7 +231,7 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
           ),
           _buildDetailSection(
             context,
-            title: "Información del Vehículo",
+            title: "Vehículo Utilizado",
             icon: Icons.directions_car_filled_outlined,
             details: [
               _buildDetailItem("Marca:", widget.trip.vehicleBrand),
@@ -211,45 +241,56 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
           ),
           _buildDetailSection(
             context,
-            title: "Datos del Recorrido",
-            icon: Icons.route_outlined,
+            title: "Información del Recorrido",
+            icon: Icons.article_outlined,
             details: [
               _buildDetailItem("Título:", widget.trip.tripTitle),
               _buildDetailItem("Descripción:", widget.trip.tripDescription, isMultiline: true),
-              _buildDetailItem("Distancia:", "${widget.trip.distanceKm.toStringAsFixed(2)} km"),
+              _buildDetailItem("Distancia:", "${widget.trip.distanceKm.toStringAsFixed(1)} km"),
               _buildDetailItem("Fecha:", DateFormat('EEEE, dd MMMM, hh:mm a', 'es_CO').format(widget.trip.createdAt.toLocal())),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 20), 
         ],
       ),
     );
   }
 
   Widget _buildDetailSection(BuildContext context, {required String title, required IconData icon, required List<Widget> details}) {
-    return Card(
-      elevation: 1,
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Container(
         padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.0),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.15),
+              spreadRadius: 1,
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ]
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                Icon(icon, size: 28, color: Theme.of(context).primaryColor),
-                const SizedBox(width: 10),
+                Icon(icon, size: 26, color: Theme.of(context).primaryColorDark),
+                const SizedBox(width: 12),
                 Text(
                   title,
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18
+                        fontWeight: FontWeight.bold,
+                        fontSize: 19,
+                        color: Theme.of(context).primaryColorDark
                       ),
                 ),
               ],
             ),
-            const Divider(height: 24, thickness: 0.5),
+            Divider(height: 20, thickness: 0.8, color: Colors.grey[200]),
             ...details,
           ],
         ),
@@ -258,27 +299,29 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
   }
 
   Widget _buildDetailItem(String label, String value, {bool isMultiline = false}) {
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         crossAxisAlignment: isMultiline ? CrossAxisAlignment.start : CrossAxisAlignment.center,
         children: [
           SizedBox(
-            width: 100,
+            width: 110, 
             child: Text(
-              "$label ",
+              label,
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
-                color: Colors.grey[700],
+                color: Colors.grey[800],
               ),
             ),
           ),
           Expanded(
             child: Text(
               value.isNotEmpty ? value : "No especificado",
-              style: const TextStyle(fontSize: 15, color: Colors.black87),
+              style: TextStyle(fontSize: 15, color: Colors.black.withOpacity(0.75)),
               softWrap: isMultiline,
+              textAlign: isMultiline ? TextAlign.justify : TextAlign.start,
             ),
           ),
         ],

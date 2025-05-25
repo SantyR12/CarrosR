@@ -1,7 +1,7 @@
-// lib/presentation/widgets/trip_list_item.dart
+
 import 'package:distincia_carros/data/models/trip_model.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Para formatear fechas
+import 'package:intl/intl.dart'; 
 
 class TripListItem extends StatelessWidget {
   final Trip trip;
@@ -21,54 +21,51 @@ class TripListItem extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      clipBehavior: Clip.antiAlias, // Para que la imagen respete los bordes redondeados
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(10), // Debe coincidir con el Card
+        borderRadius: BorderRadius.circular(10), 
         child: Padding(
           padding: const EdgeInsets.all(12.0),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start, // Para alinear mejor si el texto es multilínea
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Izquierda: Imagen del Vehículo o Placeholder
               SizedBox(
-                width: 80, // Ancho de la imagen/placeholder
-                height: 80, // Alto de la imagen/placeholder
-                child: ClipRRect( // Para redondear la imagen misma
+                width: 80,
+                height: 80, 
+                child: ClipRRect( 
                   borderRadius: BorderRadius.circular(8.0),
                   child: (trip.vehicleImageUrl != null && trip.vehicleImageUrl!.isNotEmpty)
-                      ? FadeInImage.assetNetwork( // Efecto de carga suave
-                          placeholder: 'assets/images/placeholder_car.png', // <--- NECESITAS UNA IMAGEN PLACEHOLDER EN TUS ASSETS
+                      ? FadeInImage.assetNetwork( 
+                          placeholder: 'assets/images/placeholder_car.png',
                           image: trip.vehicleImageUrl!,
                           fit: BoxFit.cover,
                           imageErrorBuilder: (context, error, stackTrace) {
-                            // Placeholder si hay error cargando la imagen de red
                             print("Error cargando vehicleImageUrl: $error");
                             return Image.asset(
-                              'assets/images/placeholder_car_error.png', // <--- OTRA IMAGEN PLACEHOLDER PARA ERRORES
+                              'assets/images/placeholder_car_error.png', 
                               fit: BoxFit.cover,
                             );
                           },
                         )
-                      : Container( // Placeholder si no hay imagen del vehículo
+                      : Container( 
                           decoration: BoxDecoration(
                             color: Theme.of(context).primaryColor.withOpacity(0.1),
-                            // borderRadius: BorderRadius.circular(8.0), // Ya está en ClipRRect
+                            
                           ),
                           child: Icon(
-                            Icons.directions_car_filled_outlined, // Icono de carro
+                            Icons.directions_car_filled_outlined,
                             size: 40,
                             color: Theme.of(context).primaryColor.withOpacity(0.7),
                           ),
                         ),
                 ),
               ),
-              const SizedBox(width: 16), // Espacio entre imagen y texto
-              // Centro: Información del recorrido
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center, // Para centrar verticalmente si el alto es fijo
+                  mainAxisAlignment: MainAxisAlignment.center, 
                   children: [
                     Text(
                       trip.tripTitle.isNotEmpty ? trip.tripTitle : "Recorrido",
@@ -96,7 +93,6 @@ class TripListItem extends StatelessWidget {
                   ],
                 ),
               ),
-              // Derecha: Botón de eliminar
               SizedBox(
                 width: 40,
                 child: IconButton(
