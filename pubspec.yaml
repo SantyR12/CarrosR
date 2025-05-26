@@ -86,6 +86,12 @@ flutter:
   assets:
     - assets/images/
     - assets/images/default_cars/
+
+
+
+
+
+    
   
   fonts:
     - family: Nunito
