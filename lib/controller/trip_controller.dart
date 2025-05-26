@@ -11,6 +11,12 @@ import 'package:latlong2/latlong.dart' as latlong2;
 import 'package:image_picker/image_picker.dart'; 
 import 'package:appwrite/appwrite.dart' as AppwriteSDK; 
 
+class CarOption {
+  final String displayName;
+  final String assetPath;
+  
+  CarOption({required this.displayName, required this.assetPath});
+}
 
 class TripController extends GetxController {
   final TripRepository _tripRepository = TripRepository();
@@ -20,6 +26,22 @@ class TripController extends GetxController {
   RxList<Trip> userTrips = <Trip>[].obs;
   RxBool isLoading = false.obs;
   RxString errorMessage = ''.obs;
+  Rx<File?> pickedVehicleImageFile = Rx<File?>(null);
+  RxString selectedDefaultCarAssetPath = ''.obs;
+
+  final List<CarOption> carOptions = <CarOption>[
+    CarOption(displayName: 'Chevrolet', assetPath: 'assets/images/chevrolet_sonic.png'),
+    CarOption(displayName: 'Chevrolet', assetPath: 'assets/images/chevrolet_spark.png'),
+    CarOption(displayName: 'Toyota', assetPath: 'assets/images/toyota_corolla.png'),
+    CarOption(displayName: 'Toyota', assetPath: 'assets/images/toyota_corolla_cross.png'),
+    CarOption(displayName: 'Mazda', assetPath: 'assets/images/mazda_3.png'),
+    CarOption(displayName: 'Renault', assetPath: 'assets/images/renault_sandero.png'),
+    CarOption(displayName: 'Hyundai', assetPath: 'assets/images/hyundai_tucson.png'),
+    CarOption(displayName: 'Hyundai', assetPath: 'assets/images/hyundai_i25.png'),
+    CarOption(displayName: 'Kia', assetPath: 'assets/images/kia_rio.png'),
+    CarOption(displayName: 'Kia', assetPath: 'assets/images/kia_picanto.png'),
+  ];
+
 
   final formKeyCreateTrip = GlobalKey<FormState>();
   TextEditingController vehicleBrandController = TextEditingController();
@@ -27,7 +49,7 @@ class TripController extends GetxController {
   TextEditingController vehicleYearController = TextEditingController();
   TextEditingController tripDescriptionController = TextEditingController();
   TextEditingController tripTitleController = TextEditingController();
-  Rx<File?> pickedVehicleImageFile = Rx<File?>(null);
+  
 
   Rx<latlong2.LatLng?> startPoint = Rx<latlong2.LatLng?>(null);
   Rx<latlong2.LatLng?> endPoint = Rx<latlong2.LatLng?>(null);
@@ -157,8 +179,8 @@ class TripController extends GetxController {
         tripTitle: tripTitleController.text.trim().isNotEmpty 
             ? tripTitleController.text.trim() 
             : "Recorrido - ${DateTime.now().day}/${DateTime.now().month}",
-        vehicleImageUrl: vehicleImgUrl,         // Pasar URL de imagen
-        vehicleImageFileId: vehicleImgFileId,   // Pasar File ID de imagen
+        vehicleImageUrl: vehicleImgUrl,         
+        vehicleImageFileId: vehicleImgFileId,  
         startLatitude: startPoint.value!.latitude,
         startLongitude: startPoint.value!.longitude,
         endLatitude: endPoint.value!.latitude,

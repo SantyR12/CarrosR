@@ -1,3 +1,4 @@
+import 'package:distincia_carros/controller/home_page_controller.dart';
 import 'package:distincia_carros/data/repositories/auth_repository.dart';
 import 'package:distincia_carros/presentation/pages/home_page.dart'; 
 import 'package:distincia_carros/presentation/pages/login_page.dart';  
@@ -29,10 +30,7 @@ class AuthController extends GetxController {
     try {
       final currentUser = await AppConfig.account.get();
       appwriteUser.value = currentUser;
-      if (currentUser.$id.isNotEmpty) { 
-        return true;
-      }
-      return false;
+      return true;
     } catch (e) {
       appwriteUser.value = null;
       print("CheckAuth: No hay sesión activa o error: $e");
@@ -112,13 +110,17 @@ class AuthController extends GetxController {
       appwriteUser.value = null; 
       if (Get.isRegistered<TripController>()) {
         Get.find<TripController>().userTrips.clear();
+        Get.find<TripController>().clearTripCreationData();
       }
       if (Get.isRegistered<ProfileController>()) {
         Get.find<ProfileController>().userProfile.value = null;
         Get.find<ProfileController>().pickedImageFile.value = null;
       }
+      if (Get.isRegistered<HomePageController>()) {
+        Get.find<HomePageController>().changeTabIndex(0); 
+      }
       
-      Get.offAll(() => LoginPage()); 
+      Get.offAll(() => LoginPage(), transition: Transition.fadeIn); 
     } catch (e) {
       error.value = e.toString().replaceFirst('Exception: ', '');
       Get.snackbar(

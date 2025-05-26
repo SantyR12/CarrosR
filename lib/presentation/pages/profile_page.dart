@@ -1,16 +1,13 @@
-
 import 'package:distincia_carros/controller/auth_controller.dart';
 import 'package:distincia_carros/controller/profile_controller.dart';
-import 'package:distincia_carros/presentation/pages/edit_profil_page.dart'; 
+import 'package:distincia_carros/presentation/pages/edit_profil_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfilePage extends StatelessWidget {
   final ProfileController profileController = Get.find<ProfileController>();
-
   final AuthController authController = Get.find<AuthController>();
-
 
   ProfilePage({super.key});
 
@@ -38,10 +35,9 @@ class ProfilePage extends StatelessWidget {
                 title: const Text('Tomar una Foto'),
                 onTap: () {
                   profileController.pickImage(ImageSource.camera);
-                  Get.back(); 
+                  Get.back();
                 },
               ),
-
               if (profileController.pickedImageFile.value != null ||
                   (profileController.userProfile.value?.profileImageUrl != null &&
                    profileController.userProfile.value!.profileImageUrl!.isNotEmpty)) ...[
@@ -74,7 +70,7 @@ class ProfilePage extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
 
     return Scaffold(
-      body: Obx(() { 
+      body: Obx(() {
         if (profileController.isLoading.value && profileController.userProfile.value == null) {
           return const Center(child: CircularProgressIndicator());
         }
@@ -132,15 +128,15 @@ class ProfilePage extends StatelessWidget {
 
         final profile = profileController.userProfile.value!;
         return RefreshIndicator(
-          onRefresh: () => profileController.fetchUserProfile(), 
+          onRefresh: () => profileController.fetchUserProfile(),
           color: theme.primaryColor,
-          child: ListView( 
+          child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
             children: <Widget>[
               Center(
                 child: GestureDetector(
                   onTap: () => _showImagePickerOptions(context),
-                  child: Obx(() { 
+                  child: Obx(() {
                     Widget avatarContent;
                     if (profileController.pickedImageFile.value != null) {
                       avatarContent = CircleAvatar(
@@ -154,9 +150,9 @@ class ProfilePage extends StatelessWidget {
                         onBackgroundImageError: (exception, stackTrace) {
                           print("Error cargando NetworkImage en ProfilePage: $exception");
                         },
-                        backgroundColor: Colors.grey[200], 
+                        backgroundColor: Colors.grey[200],
                         child: (profile.profileImageUrl == null || profile.profileImageUrl!.isEmpty)
-                            ? Icon(Icons.person, size: 70, color: Colors.grey[400]) 
+                            ? Icon(Icons.person, size: 70, color: Colors.grey[400])
                             : null,
                       );
                     } else {
@@ -195,31 +191,13 @@ class ProfilePage extends StatelessWidget {
                 )
               ),
               const SizedBox(height: 32),
-              _buildProfileInfoCard(
-                context,
-                Icons.account_circle_outlined, 
-                "Nombre Completo",
-                profile.name,
-                theme: theme
-              ),
-              _buildProfileInfoCard(
-                context,
-                Icons.alternate_email_rounded, 
-                "Correo Electrónico",
-                profile.email,
-                theme: theme
-              ),
-              _buildProfileInfoCard(
-                context,
-                Icons.phone_android_outlined,
-                "Número de Teléfono",
-                profile.phone ?? 'No especificado', 
-                theme: theme
-              ),
-              const SizedBox(height: 40),
+              _buildProfileInfoCard(context, Icons.account_circle_outlined, "Nombre Completo", profile.name, theme: theme ),
+              _buildProfileInfoCard(context, Icons.alternate_email_rounded, "Correo Electrónico", profile.email, theme: theme),
+              _buildProfileInfoCard(context, Icons.phone_android_outlined, "Número de Teléfono", profile.phone ?? 'No especificado', theme: theme),
+              const SizedBox(height: 30),
               ElevatedButton.icon(
                 icon: const Icon(Icons.edit_note_outlined, size: 22),
-                label: const Text('Editar Información'), 
+                label: const Text('Editar Información'),
                 style: theme.elevatedButtonTheme.style?.copyWith(
                   padding: MaterialStateProperty.all(const EdgeInsets.symmetric(vertical: 16)),
                 ),
@@ -231,6 +209,43 @@ class ProfilePage extends StatelessWidget {
                   }
                 },
               ),
+              const SizedBox(height: 16), 
+              OutlinedButton.icon(
+                icon: Icon(Icons.logout_rounded, color: theme.colorScheme.error),
+                label: Text(
+                  'Cerrar Sesión',
+                  style: TextStyle(color: theme.colorScheme.error, fontWeight: FontWeight.w500, fontSize: 16),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: theme.colorScheme.error.withOpacity(0.7), width: 1.5),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                onPressed: () {
+                  Get.dialog(
+                    AlertDialog(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                      title: const Text("Confirmar Cierre de Sesión", style: TextStyle(fontWeight: FontWeight.bold)),
+                      content: const Text("¿Estás seguro de que quieres cerrar sesión?"),
+                      actionsAlignment: MainAxisAlignment.spaceBetween,
+                      actions: [
+                        TextButton(
+                          onPressed: () => Get.back(), 
+                          child: Text("CANCELAR", style: TextStyle(color: theme.textTheme.bodySmall?.color)),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Get.back(); 
+                            authController.logout(); 
+                          },
+                          child: Text("CERRAR SESIÓN", style: TextStyle(color: theme.colorScheme.error, fontWeight: FontWeight.bold)),
+                        ),
+                      ],
+                    )
+                  );
+                },
+              ),
+              const SizedBox(height: 20),
             ],
           ),
         );
@@ -239,6 +254,7 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildProfileInfoCard(BuildContext context, IconData icon, String label, String value, {required ThemeData theme}) {
+    // ... (esta función no cambia)
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
@@ -253,7 +269,6 @@ class ProfilePage extends StatelessWidget {
             offset: const Offset(0, 4),
           ),
         ],
-
       ),
       child: Row(
         children: [
@@ -264,12 +279,12 @@ class ProfilePage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label, style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey[700], fontSize: 13, fontWeight: FontWeight.w500)),
-                const SizedBox(height: 4), // Un poco más de espacio
+                const SizedBox(height: 4),
                 Text(
-                  value.isNotEmpty ? value : "No especificado", // Texto para valores vacíos
+                  value.isNotEmpty ? value : "No especificado",
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontSize: 16,
-                    fontWeight: FontWeight.w500, // Peso normal para el valor
+                    fontWeight: FontWeight.w500,
                     color: Colors.black.withOpacity(0.85)
                   ),
                 ),

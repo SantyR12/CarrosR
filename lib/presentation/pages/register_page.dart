@@ -1,4 +1,3 @@
-// lib/presentation/pages/register_page.dart
 import 'package:distincia_carros/controller/auth_controller.dart';
 import 'package:distincia_carros/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
@@ -16,34 +15,26 @@ class RegisterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(title: Text('Crear Cuenta')), // Opcional
-      body: Stack( // <--- Usar Stack para el fondo
+      body: Stack( 
         children: [
-          // FONDO
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage("assets/images/background_auth.jpg"), // <-- MISMA IMAGEN DE FONDO
+                image: AssetImage("assets/images/background_auth.jpg"),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
-                  Colors.black.withOpacity(0.45), // Ligeramente diferente opacidad si quieres
+                  Colors.black.withOpacity(0.45),
                   BlendMode.darken
                 ),
               ),
-              // O un degradado:
-              // gradient: LinearGradient(
-              //   colors: [Colors.teal[600]!, Colors.teal[300]!],
-              //   begin: Alignment.topCenter,
-              //   end: Alignment.bottomCenter,
-              // ),
+       
             ),
           ),
 
-          // CONTENIDO DEL FORMULARIO
           Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
-              child: Container( // Contenedor para el formulario
+              child: Container( 
                 padding: const EdgeInsets.all(24.0),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.9),

@@ -37,8 +37,26 @@ class HomePage extends StatelessWidget {
               ? IconButton(
                   icon: const Icon(Icons.logout),
                   tooltip: 'Cerrar Sesión',
-                  onPressed: () {
-                    authController.logout();
+                  onPressed: (){
+                    Get.dialog(
+                      AlertDialog(
+                        title: const Text('Confirmar Cierre de Sesión'),
+                        content: const Text('¿Estás seguro de que deseas cerrar sesión?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Get.back(),
+                            child: const Text('Cancelar'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              authController.logout();
+                              Get.offAllNamed('/login');
+                            },
+                            child: const Text('Cerrar Sesión'),
+                          ),
+                        ],
+                    )
+                    );
                   },
                 )
               : const SizedBox.shrink()),
