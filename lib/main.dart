@@ -5,6 +5,7 @@ import 'package:distincia_carros/presentation/pages/home_page.dart';
 import 'package:distincia_carros/presentation/pages/login_page.dart';
 import 'package:distincia_carros/presentation/pages/register_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:distincia_carros/core/config/app_config.dart';
 import 'package:distincia_carros/controller/profile_controller.dart';
@@ -13,6 +14,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  try{
+    await dotenv.load(fileName: ".env");
+    print(".env file loaded successfully");
+  } catch (e) {
+    print("Error loading .env file: $e");
+  }
 
   final account = AppConfig.account;
   final authRepository = AuthRepository(account);
