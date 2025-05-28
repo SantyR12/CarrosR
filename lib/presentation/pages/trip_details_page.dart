@@ -143,6 +143,7 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     latlong.LatLng initialMapCenter = latlong.LatLng(widget.trip.startLatitude, widget.trip.startLongitude);
     if (_markers.isNotEmpty && _routePointsForMapVisual.isEmpty) {
       double avgLat = _markers.map((m) => m.point.latitude).reduce((a, b) => a + b) / _markers.length;
@@ -162,7 +163,7 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
           onPressed: () => Get.back(),
         ),
       ),
-      body: ListView(
+      body:ListView(
         padding: const EdgeInsets.only(bottom: 20),
         children: <Widget>[
           if (widget.trip.vehicleImageUrl != null && widget.trip.vehicleImageUrl!.isNotEmpty)

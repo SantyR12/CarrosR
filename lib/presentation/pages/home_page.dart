@@ -23,6 +23,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Obx(() {
@@ -62,7 +63,8 @@ class HomePage extends StatelessWidget {
               : const SizedBox.shrink()),
         ],
       ),
-      body: Obx(() => AnimatedSwitcher( 
+      body:
+            Obx(() => AnimatedSwitcher( 
             duration: const Duration(milliseconds: 300),
             transitionBuilder: (Widget child, Animation<double> animation) {
               return FadeTransition(

@@ -70,7 +70,21 @@ class ProfilePage extends StatelessWidget {
     final ThemeData theme = Theme.of(context);
 
     return Scaffold(
-      body: Obx(() {
+      body:Stack( 
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("assets/images/fondohomee.jpg"),
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                  Colors.black.withOpacity(0.45),
+                  BlendMode.darken
+                ),
+              ),
+            ),
+          ), 
+          Obx(() {
         if (profileController.isLoading.value && profileController.userProfile.value == null) {
           return const Center(child: CircularProgressIndicator());
         }
@@ -191,13 +205,13 @@ class ProfilePage extends StatelessWidget {
                 )
               ),
               const SizedBox(height: 32),
-              _buildProfileInfoCard(context, Icons.account_circle_outlined, "Nombre Completo", profile.name, theme: theme ),
+              _buildProfileInfoCard(context, Icons.account_circle_outlined, "Nombre ", profile.name, theme: theme ),
               _buildProfileInfoCard(context, Icons.alternate_email_rounded, "Correo Electrónico", profile.email, theme: theme),
               _buildProfileInfoCard(context, Icons.phone_android_outlined, "Número de Teléfono", profile.phone ?? 'No especificado', theme: theme),
               const SizedBox(height: 30),
               ElevatedButton.icon(
                 icon: const Icon(Icons.edit_note_outlined, size: 22),
-                label: const Text('Editar Información'),
+                label: const Text('Editar Perfil', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                 style: theme.elevatedButtonTheme.style?.copyWith(
                   padding: MaterialStateProperty.all(const EdgeInsets.symmetric(vertical: 16)),
                 ),
@@ -250,6 +264,8 @@ class ProfilePage extends StatelessWidget {
           ),
         );
       }),
+        ],
+      ),
     );
   }
 

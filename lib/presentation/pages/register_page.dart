@@ -14,20 +14,20 @@ class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return Scaffold(
       body: Stack( 
         children: [
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage("assets/images/background_auth.jpg"),
+                image: AssetImage("assets/images/mapa.jpg"),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
                   Colors.black.withOpacity(0.45),
                   BlendMode.darken
                 ),
               ),
-       
             ),
           ),
 

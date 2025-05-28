@@ -58,7 +58,22 @@ class CreateTripFormPage extends StatelessWidget {
 
 
     return Scaffold(
-      body: SingleChildScrollView(
+      body:Stack(
+        children: [
+          // FONDO DE IMAGEN
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: const AssetImage("assets/images/fondohomee.jpg"), // ASEGÚRATE QUE ESTE ASSET EXISTA
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                  Colors.black.withOpacity(0.6), // Oscurecer un poco más el fondo
+                  BlendMode.darken,
+                ),
+              ),
+            ),
+          ),
+            SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Form(
           key: tripController.formKeyCreateTrip,
@@ -212,6 +227,8 @@ class CreateTripFormPage extends StatelessWidget {
             ],
           ),
         ),
+      ),
+        ],
       ),
     );
   }

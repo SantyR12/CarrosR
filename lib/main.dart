@@ -1,4 +1,3 @@
-
 import 'package:distincia_carros/controller/auth_controller.dart';
 import 'package:distincia_carros/controller/home_page_controller.dart';
 import 'package:distincia_carros/data/repositories/auth_repository.dart';
@@ -39,86 +38,104 @@ void main() async {
         GetPage(name: '/home', page: () => HomePage()),
       ],
       theme: ThemeData(
-        primarySwatch: Colors.teal, 
-        scaffoldBackgroundColor: Colors.grey[100], 
-        fontFamily: 'Nunito', 
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.teal.shade800, 
+          brightness: Brightness.light, 
+          primary: Colors.teal.shade800,
+          secondary: Colors.amber.shade700, 
+          surface: Colors.grey[100],      
+          background: Colors.blueGrey[50], 
+          error: Colors.red.shade700,      
+          onPrimary: Colors.white,         
+          onSecondary: Colors.black,     
+          onSurface: Colors.black87,      
+          onBackground: Colors.black87,    
+          onError: Colors.white,          
+        ),
+        scaffoldBackgroundColor: Colors.blueGrey[50], 
+        fontFamily: 'Nunito',
 
         appBarTheme: AppBarTheme(
-          backgroundColor: Colors.teal[700],
-          foregroundColor: Colors.white,
-          elevation: 4, 
+          backgroundColor: Colors.teal[900], 
+          foregroundColor: Colors.white,    
+          elevation: 1, 
           centerTitle: true,
           titleTextStyle: const TextStyle(
+            fontFamily: 'Nunito', 
             fontSize: 20,
-            fontWeight: FontWeight.w600, 
+            fontWeight: FontWeight.w600,
             letterSpacing: 0.5,
-             color: Colors.white 
+            color: Colors.white
           ),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.teal[600],
-            foregroundColor: Colors.white,
-            textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, letterSpacing: 0.5),
-            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 28),
+            backgroundColor: Colors.teal[700], 
+            foregroundColor: Colors.white,   
+            textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Nunito', letterSpacing: 0.5), // Texto un poco más bold
+            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
+              borderRadius: BorderRadius.circular(25.0),
             ),
-            elevation: 3,
+            elevation: 2,
           ),
         ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: Colors.white, 
+          fillColor: Colors.white.withOpacity(0.9), 
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
+            borderRadius: BorderRadius.circular(12.0), 
+            borderSide: BorderSide.none, 
+          ),
+          enabledBorder: OutlineInputBorder( 
+            borderRadius: BorderRadius.circular(12.0),
             borderSide: BorderSide(color: Colors.grey[300]!),
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-            borderSide: BorderSide(color: Colors.grey[350]!),
-          ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-            borderSide: BorderSide(color: Colors.teal[700]!, width: 2.0),
+            borderRadius: BorderRadius.circular(12.0),
+            borderSide: BorderSide(color: Colors.teal.shade700, width: 2.0),
           ),
-          labelStyle: TextStyle(color: Colors.teal[800], fontWeight: FontWeight.w500),
-          hintStyle: TextStyle(color: Colors.grey[500]),
-          prefixIconColor: Colors.teal[700]?.withOpacity(0.8),
-          contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+          labelStyle: TextStyle(color: Colors.teal[800], fontWeight: FontWeight.w500, fontFamily: 'Nunito'),
+          hintStyle: TextStyle(color: Colors.grey[500], fontFamily: 'Nunito'),
+          prefixIconColor: Colors.teal[700]?.withOpacity(0.7),
+          contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+          floatingLabelBehavior: FloatingLabelBehavior.auto, 
         ),
         cardTheme: CardThemeData(
-          elevation: 2, 
+          elevation: 3, 
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.0),
+            borderRadius: BorderRadius.circular(16.0),
           ),
-          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 6)
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+          clipBehavior: Clip.antiAlias, 
+          color: Colors.white, 
         ),
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: Colors.white, 
-          selectedItemColor: Colors.teal[700],
+          backgroundColor: Colors.grey[850], 
+          selectedItemColor: Colors.teal[300],   
           unselectedItemColor: Colors.grey[500], 
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
-          unselectedLabelStyle: const TextStyle(fontSize: 11.5),
-          showSelectedLabels: true, 
+          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, fontFamily: 'Nunito'),
+          unselectedLabelStyle: const TextStyle(fontSize: 11, fontFamily: 'Nunito'),
+          showSelectedLabels: true,
           showUnselectedLabels: true,
           type: BottomNavigationBarType.fixed,
-          elevation: 10.0, 
-          selectedIconTheme: IconThemeData(size: 26, color: Colors.teal[700]), 
+          elevation: 0, 
+          selectedIconTheme: IconThemeData(size: 26, color: Colors.teal[300]),
           unselectedIconTheme: IconThemeData(size: 22, color: Colors.grey[500]),
         ),
         floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: Colors.orange[600], 
-          foregroundColor: Colors.white,
+          backgroundColor: Colors.amber[700], 
+          foregroundColor: Colors.black, 
           elevation: 4,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
         textTheme: TextTheme(
-            headlineSmall: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.teal[900]),
-            titleLarge: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w600, color: Colors.black87),
-            titleMedium: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w500, color: Colors.black54),
-            bodyLarge: TextStyle(fontSize: 16.0, color: Colors.black87),
-            bodyMedium: TextStyle(fontSize: 14.0, color: Colors.grey[800]),
-            labelLarge: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white) 
+          headlineSmall: TextStyle(fontFamily: 'Nunito', fontSize: 26.0, fontWeight: FontWeight.bold, color: Colors.teal[900]),
+          titleLarge: TextStyle(fontFamily: 'Nunito', fontSize: 20.0, fontWeight: FontWeight.w600, color: Colors.black.withOpacity(0.85)),
+          titleMedium: TextStyle(fontFamily: 'Nunito', fontSize: 17.0, fontWeight: FontWeight.w500, color: Colors.black.withOpacity(0.75)),
+          bodyLarge: TextStyle(fontFamily: 'Nunito', fontSize: 16.0, color: Colors.black.withOpacity(0.8)),
+          bodyMedium: TextStyle(fontFamily: 'Nunito', fontSize: 14.0, color: Colors.grey[800]),
+          labelLarge: TextStyle(fontFamily: 'Nunito', fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white) 
         ),
       ),
       localizationsDelegates: const [

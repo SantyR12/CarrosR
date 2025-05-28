@@ -13,13 +13,14 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return Scaffold(
       body: Stack( 
         children: [
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage("assets/images/background_auth.jpg"),
+                image: AssetImage("assets/images/mapa.jpg"),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
                   Colors.black.withOpacity(0.4), 
@@ -54,7 +55,7 @@ class LoginPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch, 
                     children: <Widget>[
                       Text(
-                        "Bienvenido",
+                        "Bienvenido a Recorrido de autos",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 28,
@@ -65,7 +66,7 @@ class LoginPage extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text(
                         "Inicia sesión para continuar",
-                         textAlign: TextAlign.center,
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.grey[700],
