@@ -86,11 +86,15 @@ Sigue estos pasos para configurar y ejecutar la aplicación en tu entorno local.
         ```
 
 3.  **Obtén las Dependencias de Flutter:**
+     * Pide actualizar la dependencia de intl en la terminal dependiento de tu sdk
+    ```bash
+    flutter pub add intl:^0.20.2
+    ```
     ```bash
     flutter pub get
     ```
 
-4.  **Ejecuta la Aplicación:**
+5.  **Ejecuta la Aplicación:**
     * Asegúrate de tener un emulador en ejecución o un dispositivo conectado.
     * Puedes verificar los dispositivos disponibles con: `flutter devices`
     * Ejecuta la aplicación:
