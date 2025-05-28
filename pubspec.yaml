@@ -52,7 +52,7 @@ dependencies:
   geolocator: ^14.0.0
   http: ^1.4.0
   google_maps_flutter: ^2.3.0
-  intl: 0.19.0
+  intl: 0.20.2
   flutter_polyline_points: ^2.1.0
   flutter_dotenv: ^5.2.1
   #flutter_web_auth_2: ^3.1.2
@@ -87,7 +87,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/default_cars/
-    - .env
+
 
 
 

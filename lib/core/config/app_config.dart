@@ -6,8 +6,8 @@ import 'package:get/get.dart';
 
 class AppConfig {
   static final Client _client = Client()
-      .setEndpoint(EnvConfig.appwriteEndpoint)       
-      .setProject(EnvConfig.appwriteProjectId); 
+      .setEndpoint(AppwriteConstants.endpoint) 
+      .setProject(AppwriteConstants.projectId); 
 
   static Client get client => _client;
   static Account get account => Account(_client);

@@ -9,8 +9,8 @@ import 'package:latlong2/latlong.dart' as latlong;
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 
-// const String MAPTILER_API_KEY = "IMdKNAWagDsTUpy68b5d"; 
-// const String OPENROUTESERVICE_API_KEY = "5b3ce3597851110001cf62484b05b43d095541ed9a40e378ca759ad5"; 
+const String MAPTILER_API_KEY = "IMdKNAWagDsTUpy68b5d"; 
+const String OPENROUTESERVICE_API_KEY = "5b3ce3597851110001cf62484b05b43d095541ed9a40e378ca759ad5"; 
 class MapRoutePage extends StatefulWidget {
   const MapRoutePage({super.key});
   @override
@@ -146,17 +146,17 @@ class _MapRoutePageState extends State<MapRoutePage> {
     if (tripController.startPoint.value == null || tripController.endPoint.value == null) {
       return;
     }
-    final String orsApiKey = EnvConfig.openRouteServiceApiKey;
-    if (orsApiKey.isEmpty || orsApiKey == "TU_API_KEY_DE_OPENROUTESERVICE_AQUI") {
-        Get.snackbar("API Key Faltante", "Añade tu API Key de OpenRouteService.",
-        backgroundColor: Colors.red, colorText: Colors.white, duration: Duration(seconds: 5));
-        _fallbackToStraightLine(); 
+
+    if (OPENROUTESERVICE_API_KEY == "TU_CLAVE_ORS_REAL_Y_VALIDA_AQUI" || OPENROUTESERVICE_API_KEY.isEmpty || OPENROUTESERVICE_API_KEY == "5b3dse3597851dsd110001cf62484b05b43d095541ed9a40e378ca759ad5") {
+        Get.snackbar("API Key de ORS Inválida", "Por favor, configura una API Key válida de OpenRouteService directamente en el código.",
+        backgroundColor: Colors.redAccent, colorText: Colors.white, duration: const Duration(seconds: 6), snackPosition: SnackPosition.TOP);
+        _fallbackToStraightLine();
         return;
     }
     String startCoords = "${tripController.startPoint.value!.longitude},${tripController.startPoint.value!.latitude}";
     String endCoords = "${tripController.endPoint.value!.longitude},${tripController.endPoint.value!.latitude}";
     var url = Uri.parse(
-        'https://api.openrouteservice.org/v2/directions/driving-car?api_key=$orsApiKey&start=$startCoords&end=$endCoords&geometry_simplify=true&instructions=false');
+        'https://api.openrouteservice.org/v2/directions/driving-car?api_key=$OPENROUTESERVICE_API_KEY&start=$startCoords&end=$endCoords&geometry_simplify=true&instructions=false');
     try {
       var response = await http.get(url, headers: {'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8'});
       _hideLoadingDialog();
@@ -323,7 +323,7 @@ class _MapRoutePageState extends State<MapRoutePage> {
             ),
             children: [
               TileLayer(
-                urlTemplate: "https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${EnvConfig.mapTilerApiKey}",
+                urlTemplate: "https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=$MAPTILER_API_KEY",
                 userAgentPackageName: 'com.tuempresa.distincia_carros', 
               ),
               if (_currentRoutePoints.isNotEmpty && _currentRoutePoints.length >= 2)
