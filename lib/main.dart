@@ -14,27 +14,21 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   try{
     await dotenv.load(fileName: ".env");
     print(".env file loaded successfully");
   } catch (e) {
     print("Error loading .env file: $e");
   }
-
   final account = AppConfig.account;
   final authRepository = AuthRepository(account);
-
   Get.put(AuthController(authRepository));
   Get.put(ProfileController());
   Get.put(TripController());
   Get.put(HomePageController());
-
   final authController = Get.find<AuthController>();
   await authController.checkAuth();
-
   bool isLoggedIn = authController.appwriteUser.value != null;
-
   runApp(
     GetMaterialApp(
       title: 'Mis Recorridos App',
@@ -62,7 +56,6 @@ void main() async {
         ),
         scaffoldBackgroundColor: Colors.blueGrey[50], 
         fontFamily: 'Nunito',
-
         appBarTheme: AppBarTheme(
           backgroundColor: Colors.teal[900], 
           foregroundColor: Colors.white,    
