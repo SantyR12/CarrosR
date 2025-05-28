@@ -1,4 +1,3 @@
-
 import 'package:distincia_carros/controller/auth_controller.dart';
 import 'package:distincia_carros/controller/home_page_controller.dart';
 import 'package:distincia_carros/presentation/pages/create_trip_form_page.dart';

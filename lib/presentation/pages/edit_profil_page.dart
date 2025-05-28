@@ -8,9 +8,7 @@ import 'package:image_picker/image_picker.dart';
 
 class EditProfilePage extends StatefulWidget {
   final UserProfile currentProfile;
-
   const EditProfilePage({super.key, required this.currentProfile});
-
   @override
   State<EditProfilePage> createState() => _EditProfilePageState();
 }
@@ -18,24 +16,16 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   final ProfileController profileController = Get.find<ProfileController>();
   final _formKey = GlobalKey<FormState>();
-
   late TextEditingController _nameController;
   late TextEditingController _emailController;
   late TextEditingController _phoneController;
-
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.currentProfile.name);
     _emailController = TextEditingController(text: widget.currentProfile.email);
     _phoneController = TextEditingController(text: widget.currentProfile.phone ?? '');
-    // Si el usuario ya había seleccionado una imagen en ProfilePage,
-    // profileController.pickedImageFile.value ya la tendría.
-    // Si quieres que siempre empiece sin una imagen pre-seleccionada (de la sesión anterior del picker),
-    // podrías limpiar profileController.pickedImageFile.value = null; aquí, pero
-    // generalmente es mejor que el controlador mantenga su estado.
   }
-
   @override
   void dispose() {
     _nameController.dispose();
@@ -43,25 +33,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
     _phoneController.dispose();
     super.dispose();
   }
-
   Future<void> _handleSaveProfile() async {
     if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save(); // Opcional si no usas onSaved en TextFormField
-      FocusScope.of(context).unfocus(); // Ocultar teclado
-
-      // La imagen a subir (si hay una nueva) ya está en profileController.pickedImageFile.value
+      _formKey.currentState!.save(); 
+      FocusScope.of(context).unfocus(); 
       await profileController.updateUserProfileData(
         name: _nameController.text.trim(),
         phone: _phoneController.text.trim().isNotEmpty ? _phoneController.text.trim() : null,
       );
-
       if (profileController.errorMessage.value.isEmpty && mounted) {
-        // El snackbar de éxito ya se muestra en el controller
-        // Esperar un poco para que el usuario vea el snackbar si lo hay
         await Future.delayed(const Duration(milliseconds: 400));
         if (mounted) Get.back(); // Volver a la página de perfil
       }
-      // Si hay error, el snackbar de error ya se muestra desde el controller
     } else {
       Get.snackbar(
         "Campos Inválidos",
@@ -72,9 +55,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       );
     }
   }
-
   void _showImagePickerOptions(BuildContext context) {
-    final ThemeData theme = Theme.of(context); // Para usar colores del tema
+    final ThemeData theme = Theme.of(context); 
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -107,28 +89,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
       },
     );
   }
-
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-
-    // Colores para el texto de los inputs sobre un fondo de formulario claro
-    // cuando la página tiene un fondo de imagen oscuro.
     final Color textInputColorOnLightForm = theme.brightness == Brightness.dark ? Colors.white.withOpacity(0.9) : Colors.black.withOpacity(0.85);
     final Color labelInputColorOnLightForm = theme.brightness == Brightness.dark ? Colors.grey.shade400 : theme.primaryColorDark;
-
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Editar Mi Perfil'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
           onPressed: () {
-            // Comprobar si hay cambios sin guardar
             bool hasUnsavedChanges = profileController.pickedImageFile.value != null ||
                 _nameController.text.trim() != widget.currentProfile.name ||
                 _phoneController.text.trim() != (widget.currentProfile.phone ?? '');
-
             if (hasUnsavedChanges) {
               Get.dialog(
                 AlertDialog(
@@ -142,9 +116,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         child: Text("CONTINUAR EDITANDO", style: TextStyle(color: theme.primaryColorDark, fontWeight: FontWeight.bold))),
                     TextButton(
                         onPressed: () {
-                          profileController.pickedImageFile.value = null; // Limpiar imagen seleccionada en el controlador
-                          Get.back(); // Cerrar diálogo
-                          Get.back(); // Volver a la página anterior
+                          profileController.pickedImageFile.value = null; 
+                          Get.back(); 
+                          Get.back(); 
                         },
                         child: Text("DESCARTAR Y SALIR", style: TextStyle(color: Colors.red[700], fontWeight: FontWeight.bold))),
                   ],
@@ -158,7 +132,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         actions: [
           Obx(() => profileController.isLoading.value
               ? const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0), // Ajustar padding
+                  padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0), 
                   child: SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white)))
               : TextButton(
                   onPressed: _handleSaveProfile,
@@ -169,32 +143,30 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
       body: Stack(
         children: [
-          // FONDO DE IMAGEN
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: const AssetImage("assets/images/fondohomee.jpg"), // ASEGÚRATE QUE ESTE ASSET EXISTA
+                image: const AssetImage("assets/images/fondohomee.jpg"), 
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
-                  Colors.black.withOpacity(0.6), // Oscurecer un poco más el fondo
+                  Colors.black.withOpacity(0.6), 
                   BlendMode.darken,
                 ),
               ),
             ),
           ),
-          // CONTENIDO DEL FORMULARIO SUPERPUESTO
-          Center( // Centrar el Card del formulario
+          Center( 
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
               child: Container(
                 padding: const EdgeInsets.all(24.0),
-                margin: const EdgeInsets.symmetric(horizontal: 16.0), // Margen para que no pegue a los bordes
+                margin: const EdgeInsets.symmetric(horizontal: 16.0), 
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.95), // Fondo blanco semitransparente para el "card"
+                  color: Colors.white.withOpacity(0.95), 
                   borderRadius: BorderRadius.circular(16.0),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.25), // Sombra más pronunciada
+                      color: Colors.black.withOpacity(0.25),
                       blurRadius: 15,
                       spreadRadius: 2,
                     )
@@ -202,9 +174,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 child: Form(
                   key: _formKey,
-                  autovalidateMode: AutovalidateMode.disabled, // Validar solo al presionar guardar
+                  autovalidateMode: AutovalidateMode.disabled, 
                   child: Column(
-                    mainAxisSize: MainAxisSize.min, // Para que el Container se ajuste al contenido
+                    mainAxisSize: MainAxisSize.min, 
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       GestureDetector(
@@ -216,7 +188,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           } else if (widget.currentProfile.profileImageUrl != null && widget.currentProfile.profileImageUrl!.isNotEmpty) {
                             imageProviderToShow = NetworkImage(widget.currentProfile.profileImageUrl!);
                           }
-
                           return Container(
                             width: 150, height: 150,
                             decoration: BoxDecoration(
@@ -235,7 +206,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 : Stack(
                                     alignment: Alignment.center,
                                     children: [
-                                      Container( // Overlay para el ícono de cámara
+                                      Container( 
                                         width: 150, height: 150,
                                         decoration: BoxDecoration(
                                           color: Colors.black.withOpacity(0.3),
@@ -253,8 +224,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         label: Text("Cambiar Foto de Perfil", style: TextStyle(color: theme.primaryColorDark, fontWeight: FontWeight.w500)),
                         onPressed: () => _showImagePickerOptions(context),
                       ),
-                      const SizedBox(height: 24), // Espacio antes de los campos
-
+                      const SizedBox(height: 24), 
                       TextFormField(
                         controller: _nameController,
                         style: TextStyle(color: textInputColorOnLightForm, fontSize: 16),
@@ -262,7 +232,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           labelText: 'Nombre Completo',
                           labelStyle: TextStyle(color: labelInputColorOnLightForm, fontWeight: FontWeight.w500),
                           prefixIcon: Icon(Icons.person_outline_rounded, color: labelInputColorOnLightForm),
-                          // Usar estilos de InputDecorationTheme para bordes, fillColor, etc.
                         ),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) return 'El nombre no puede estar vacío';
@@ -273,18 +242,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       const SizedBox(height: 20),
                       TextFormField(
                         controller: _emailController,
-                        style: TextStyle(color: Colors.grey[800], fontWeight: FontWeight.w500, fontSize: 16), // Texto legible gris oscuro
+                        style: TextStyle(color: Colors.grey[800], fontWeight: FontWeight.w500, fontSize: 16), 
                         decoration: InputDecoration(
                           labelText: 'Correo Electrónico',
                           labelStyle: TextStyle(color: Colors.grey[700]),
                           prefixIcon: Icon(Icons.email_outlined, color: Colors.grey[700]),
                           filled: true,
-                          fillColor: Colors.grey[200], // Fondo para indicar deshabilitado
+                          fillColor: Colors.grey[200],
                           disabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10.0),
                             borderSide: BorderSide(color: Colors.grey[350]!),
                           ),
-                          // No es necesario 'enabledBorder' si 'enabled' es false
                         ),
                         enabled: false,
                       ),

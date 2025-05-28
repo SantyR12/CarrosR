@@ -13,38 +13,31 @@ import 'package:http/http.dart' as http;
 // const String OPENROUTESERVICE_API_KEY = "5b3ce3597851110001cf62484b05b43d095541ed9a40e378ca759ad5"; 
 class MapRoutePage extends StatefulWidget {
   const MapRoutePage({super.key});
-
   @override
   State<MapRoutePage> createState() => _MapRoutePageState();
 }
 class _MapRoutePageState extends State<MapRoutePage> {
   final TripController tripController = Get.find<TripController>();
   final MapController _mapController = MapController();
-
   List<latlong.LatLng> _currentRoutePoints = [];
   List<Marker> _markers = [];
   latlong.LatLng _initialCenter = latlong.LatLng(1.2136, -77.2793);
   double _initialZoom = 13.0;
   bool _isSettingStartPoint = true;
   bool _isMapReady = false;
-
   @override
   void initState() {
     super.initState();
   }
-
   void _initializeMapRelatedData() {
     _prepareInitialMapState();
     _requestLocationPermissionAndMoveCamera();
   }
-
   void _prepareInitialMapState() {
     List<Marker> initialMarkers = [];
     bool shouldCenterMap = false;
-
     final latlong.LatLng? startP = tripController.startPoint.value;
     final latlong.LatLng? endP = tripController.endPoint.value;
-
     if (startP != null) {
       initialMarkers.add(
         Marker(
@@ -83,13 +76,10 @@ class _MapRoutePageState extends State<MapRoutePage> {
         });
     }
   }
-
   Future<void> _requestLocationPermissionAndMoveCamera() async {
     if (!_isMapReady || !mounted) return;
-
     bool serviceEnabled;
     LocationPermission permission;
-
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       Get.snackbar('Ubicación Deshabilitada', 'Por favor, activa los servicios de ubicación.', snackPosition: SnackPosition.BOTTOM);
@@ -110,7 +100,7 @@ class _MapRoutePageState extends State<MapRoutePage> {
     try {
       Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
       final userLocation = latlong.LatLng(position.latitude, position.longitude);
-       if (mounted) {
+      if (mounted) {
         _mapController.move(userLocation, 14.0);
       }
     } catch (e) {
@@ -118,13 +108,11 @@ class _MapRoutePageState extends State<MapRoutePage> {
       Get.snackbar('Error de Ubicación', 'No se pudo obtener tu ubicación actual.', snackPosition: SnackPosition.BOTTOM);
     }
   }
-
   void _onMapTap(TapPosition tapPosition, latlong.LatLng latlng) {
     if (!mounted) return;
     setState(() {
       final newPointForMap = latlng;
       List<Marker> updatedMarkers = List.from(_markers);
-
       if (tripController.startPoint.value == null || _isSettingStartPoint) {
         tripController.startPoint.value = newPointForMap;
         updatedMarkers.removeWhere((m) => (m.child as Tooltip).message == "Inicio");
@@ -154,7 +142,6 @@ class _MapRoutePageState extends State<MapRoutePage> {
       _markers = updatedMarkers;
     });
   }
-
   Future<void> _drawRouteWithORS() async {
     if (tripController.startPoint.value == null || tripController.endPoint.value == null) {
       return;
@@ -166,17 +153,13 @@ class _MapRoutePageState extends State<MapRoutePage> {
         _fallbackToStraightLine(); 
         return;
     }
-
     String startCoords = "${tripController.startPoint.value!.longitude},${tripController.startPoint.value!.latitude}";
     String endCoords = "${tripController.endPoint.value!.longitude},${tripController.endPoint.value!.latitude}";
-
     var url = Uri.parse(
         'https://api.openrouteservice.org/v2/directions/driving-car?api_key=$orsApiKey&start=$startCoords&end=$endCoords&geometry_simplify=true&instructions=false');
-
     try {
       var response = await http.get(url, headers: {'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8'});
       _hideLoadingDialog();
-
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
         if (data['features'] == null || (data['features'] as List).isEmpty) {
@@ -186,23 +169,19 @@ class _MapRoutePageState extends State<MapRoutePage> {
         }
         List<dynamic> coordinates = data['features'][0]['geometry']['coordinates'];
         double distanceMeters = data['features'][0]['properties']['segments'][0]['distance'].toDouble();
-
         tripController.calculatedDistanceKm.value = distanceMeters / 1000;
         
         List<latlong.LatLng> routePointsForMap = coordinates.map((coord) {
           return latlong.LatLng(coord[1].toDouble(), coord[0].toDouble());
         }).toList();
-
         tripController.polylinePointsForDB.clear();
         routePointsForMap.forEach((p) => tripController.polylinePointsForDB.add({'lat': p.latitude, 'lng': p.longitude}));
-
         if (mounted) {
             setState(() {
             _currentRoutePoints = routePointsForMap;
             });
             _centerMapOnCurrentPoints();
         }
-
       } else {
         print("Error de OpenRouteService (Status ${response.statusCode}): ${response.body}");
         Get.snackbar("Error de Ruta ORS", "No se pudo obtener la ruta (${response.statusCode}). Revisa API Key/cuotas de ORS.", snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.orange);
@@ -212,10 +191,9 @@ class _MapRoutePageState extends State<MapRoutePage> {
       _hideLoadingDialog();
       print("Excepción al llamar a ORS: $e");
       Get.snackbar("Error de Conexión ORS", "No se pudo conectar al servicio de rutas.", snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
-       _fallbackToStraightLine();
+      _fallbackToStraightLine();
     }
   }
-
   void _fallbackToStraightLine() {
     if (tripController.startPoint.value != null && tripController.endPoint.value != null) {
       final p1 = tripController.startPoint.value!;
@@ -234,25 +212,22 @@ class _MapRoutePageState extends State<MapRoutePage> {
       }
     }
   }
-
   void _calculateDistanceBetweenTwoPoints(latlong.LatLng p1, latlong.LatLng p2) {
-     double distance = Geolocator.distanceBetween(
+    double distance = Geolocator.distanceBetween(
         p1.latitude, p1.longitude,
         p2.latitude, p2.longitude
-     );
-     tripController.calculatedDistanceKm.value = distance / 1000;
+    );
+    tripController.calculatedDistanceKm.value = distance / 1000;
   }
-
   void _clearRouteAndDistanceUI() {
-     if (mounted) {
+    if (mounted) {
         setState(() {
             _currentRoutePoints.clear();
         });
-     }
-     tripController.calculatedDistanceKm.value = 0.0;
-     tripController.polylinePointsForDB.clear();
+    }
+    tripController.calculatedDistanceKm.value = 0.0;
+    tripController.polylinePointsForDB.clear();
   }
-
   void _clearMapAndSelection() {
     if (mounted) {
         setState(() {
@@ -268,13 +243,11 @@ class _MapRoutePageState extends State<MapRoutePage> {
     }
     Get.snackbar("Mapa Limpio", "Selecciona un nuevo punto de inicio.", snackPosition: SnackPosition.TOP);
   }
-
   void _centerMapOnCurrentPoints() {
     if (!_isMapReady || !mounted) {
         print("MapController no está listo o widget no montado (en _centerMapOnCurrentPoints).");
         return;
     }
-
     List<latlong.LatLng> pointsToBound = [];
     if (_markers.isNotEmpty) _markers.forEach((m) => pointsToBound.add(m.point));
     if (_currentRoutePoints.isNotEmpty) {
@@ -284,10 +257,8 @@ class _MapRoutePageState extends State<MapRoutePage> {
     if (pointsToBound.isNotEmpty) {
         var calculatedBounds = LatLngBounds.fromPoints(pointsToBound);
         bool isArea = calculatedBounds.southEast != calculatedBounds.northWest;
-
-
         if (isArea || pointsToBound.length > 1) { 
-             _mapController.fitCamera(
+            _mapController.fitCamera(
                 CameraFit.bounds(
                     bounds: calculatedBounds, 
                     padding: const EdgeInsets.all(50.0) 
@@ -304,7 +275,6 @@ class _MapRoutePageState extends State<MapRoutePage> {
         _mapController.move(_initialCenter, _initialZoom);
     }
   }
-
   void _showLoadingDialog(String message) {
     if (!(Get.isDialogOpen ?? false)) {
       Get.dialog(
@@ -315,13 +285,11 @@ class _MapRoutePageState extends State<MapRoutePage> {
       );
     }
   }
-
   void _hideLoadingDialog() {
     if (Get.isDialogOpen ?? false) {
       Get.back();
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -356,9 +324,8 @@ class _MapRoutePageState extends State<MapRoutePage> {
             children: [
               TileLayer(
                 urlTemplate: "https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${EnvConfig.mapTilerApiKey}",
-                userAgentPackageName: 'com.tuempresa.distincia_carros', // Reemplaza
+                userAgentPackageName: 'com.tuempresa.distincia_carros', 
               ),
-              // Condicionar la PolylineLayer
               if (_currentRoutePoints.isNotEmpty && _currentRoutePoints.length >= 2)
                 PolylineLayer(
                   polylines: [
@@ -375,7 +342,7 @@ class _MapRoutePageState extends State<MapRoutePage> {
           Positioned(
             top: 10, left: 10, right: 10,
             child: Card( 
-                 elevation: 3,
+                elevation: 3,
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
                 child: Obx(() => Row(
@@ -385,7 +352,7 @@ class _MapRoutePageState extends State<MapRoutePage> {
                       'Distancia:',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.grey[700]),
                     ),
-                     Text(
+                    Text(
                       '${tripController.calculatedDistanceKm.value.toStringAsFixed(2)} km',
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.deepPurple),
                     ),
@@ -412,7 +379,7 @@ class _MapRoutePageState extends State<MapRoutePage> {
                 if(tripController.startPoint.value == null) {
                     if (_isMapReady) _requestLocationPermissionAndMoveCamera();
                 } else if (_markers.isNotEmpty && _isMapReady) {
-                     _centerMapOnCurrentPoints();
+                    _centerMapOnCurrentPoints();
                 }
               },
             ),

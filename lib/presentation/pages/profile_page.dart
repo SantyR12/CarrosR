@@ -8,9 +8,7 @@ import 'package:image_picker/image_picker.dart';
 class ProfilePage extends StatelessWidget {
   final ProfileController profileController = Get.find<ProfileController>();
   final AuthController authController = Get.find<AuthController>();
-
   ProfilePage({super.key});
-
   void _showImagePickerOptions(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -40,7 +38,7 @@ class ProfilePage extends StatelessWidget {
               ),
               if (profileController.pickedImageFile.value != null ||
                   (profileController.userProfile.value?.profileImageUrl != null &&
-                   profileController.userProfile.value!.profileImageUrl!.isNotEmpty)) ...[
+                  profileController.userProfile.value!.profileImageUrl!.isNotEmpty)) ...[
                 const Divider(height: 1, indent: 16, endIndent: 16, thickness: 0.5),
                 ListTile(
                   leading: Icon(Icons.delete_sweep_outlined, color: Colors.red[600]),
@@ -51,9 +49,9 @@ class ProfilePage extends StatelessWidget {
                     Get.snackbar(
                       "Previsualización Limpia",
                       "La imagen se quitará definitivamente al guardar los cambios en 'Editar Perfil'.",
-                       snackPosition: SnackPosition.BOTTOM,
-                       backgroundColor: Colors.orange[700],
-                       colorText: Colors.white
+                      snackPosition: SnackPosition.BOTTOM,
+                      backgroundColor: Colors.orange[700],
+                      colorText: Colors.white
                     );
                   },
                 ),
@@ -64,11 +62,9 @@ class ProfilePage extends StatelessWidget {
       },
     );
   }
-
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-
     return Scaffold(
       body:Stack( 
         children: [
@@ -88,7 +84,6 @@ class ProfilePage extends StatelessWidget {
         if (profileController.isLoading.value && profileController.userProfile.value == null) {
           return const Center(child: CircularProgressIndicator());
         }
-
         final authUserFromController = authController.appwriteUser.value;
         if (profileController.userProfile.value == null) {
           return Center(
@@ -139,7 +134,6 @@ class ProfilePage extends StatelessWidget {
             ),
           );
         }
-
         final profile = profileController.userProfile.value!;
         return RefreshIndicator(
           onRefresh: () => profileController.fetchUserProfile(),
@@ -268,9 +262,7 @@ class ProfilePage extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildProfileInfoCard(BuildContext context, IconData icon, String label, String value, {required ThemeData theme}) {
-    // ... (esta función no cambia)
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),

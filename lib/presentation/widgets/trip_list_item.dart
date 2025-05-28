@@ -1,4 +1,3 @@
-
 import 'package:distincia_carros/data/models/trip_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart'; 
@@ -7,14 +6,12 @@ class TripListItem extends StatelessWidget {
   final Trip trip;
   final VoidCallback onTap;
   final VoidCallback onDelete;
-
   const TripListItem({
     super.key,
     required this.trip,
     required this.onTap,
     required this.onDelete,
   });
-
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -81,7 +78,7 @@ class TripListItem extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                     Text(
+                    Text(
                       '${trip.distanceKm.toStringAsFixed(1)} km',
                       style: TextStyle(fontSize: 13, color: Colors.grey[700]),
                     ),

@@ -6,9 +6,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart'; 
 class CreateTripFormPage extends StatelessWidget {
   final TripController tripController = Get.find<TripController>();
-
   CreateTripFormPage({super.key});
-
   void _showImagePickerOptions(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -50,24 +48,20 @@ class CreateTripFormPage extends StatelessWidget {
       },
     );
   }
-
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
     });
-
-
     return Scaffold(
       body:Stack(
         children: [
-          // FONDO DE IMAGEN
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: const AssetImage("assets/images/fondohomee.jpg"), // ASEGÚRATE QUE ESTE ASSET EXISTA
+                image: const AssetImage("assets/images/fondohomee.jpg"), 
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
-                  Colors.black.withOpacity(0.6), // Oscurecer un poco más el fondo
+                  Colors.black.withOpacity(0.6), 
                   BlendMode.darken,
                 ),
               ),

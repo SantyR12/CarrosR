@@ -16,27 +16,22 @@ class TripDetailsPage extends StatefulWidget {
   @override
   State<TripDetailsPage> createState() => _TripDetailsPageState();
 }
-
 class _TripDetailsPageState extends State<TripDetailsPage> {
   final MapController _mapController = MapController();
   List<Marker> _markers = [];
   List<Polyline> _polylines = [];
   List<latlong.LatLng> _routePointsForMapVisual = [];
   bool _isMapDetailsReady = false;
-
   @override
   void initState() {
     super.initState();
   }
-
   void _initializeDetailsMapData() {
     _buildMapElements();
   }
-
   void _buildMapElements() {
     List<Marker> localMarkers = [];
     List<latlong.LatLng> mainTripPoints = [];
-
     final startPoint = latlong.LatLng(widget.trip.startLatitude, widget.trip.startLongitude);
     localMarkers.add(
       Marker(
@@ -47,7 +42,6 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
       ),
     );
     mainTripPoints.add(startPoint);
-
     widget.trip.waypoints.forEach((wp) {
       if (wp['lat'] != null && wp['lng'] != null) {
         final waypoint = latlong.LatLng(wp['lat']!, wp['lng']!);
@@ -62,7 +56,6 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
         mainTripPoints.add(waypoint);
       }
     });
-
     final endPoint = latlong.LatLng(widget.trip.endLatitude, widget.trip.endLongitude);
     localMarkers.add(
       Marker(
@@ -73,9 +66,7 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
       ),
     );
     mainTripPoints.add(endPoint);
-
     List<Polyline> localPolylines = [];
-
     if (widget.trip.polylinePointsForDB != null && widget.trip.polylinePointsForDB!.isNotEmpty) {
       _routePointsForMapVisual = widget.trip.polylinePointsForDB!
           .map((p) => latlong.LatLng(p['lat']!, p['lng']!))
@@ -83,7 +74,6 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
     } else {
       _routePointsForMapVisual = mainTripPoints;
     }
-
     if (_routePointsForMapVisual.length >= 2) {
       localPolylines.add(Polyline(
         points: _routePointsForMapVisual,
@@ -91,7 +81,6 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
         color: Colors.teal[600]!, 
       ));
     }
-
     if (mounted) {
       setState(() {
         _markers = localMarkers;
@@ -102,17 +91,14 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
       });
     }
   }
-
   void _centerMapOnRoute() {
     if (!_isMapDetailsReady || !mounted) return;
-
     List<latlong.LatLng> pointsToBound = [];
     if (_routePointsForMapVisual.isNotEmpty) {
       pointsToBound.addAll(_routePointsForMapVisual);
     } else if (_markers.isNotEmpty) {
       _markers.forEach((m) => pointsToBound.add(m.point));
     }
-
     if (pointsToBound.isNotEmpty) {
       var calculatedBounds = LatLngBounds.fromPoints(pointsToBound); 
 
@@ -120,8 +106,7 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
                           calculatedBounds.southWest != null &&
                           calculatedBounds.northEast != null &&
                           (calculatedBounds.southWest!.latitude != calculatedBounds.northEast!.latitude ||
-                           calculatedBounds.southWest!.longitude != calculatedBounds.northEast!.longitude);
-
+                          calculatedBounds.southWest!.longitude != calculatedBounds.northEast!.longitude);
       if (canFitBounds) {
         _mapController.fitCamera(
           CameraFit.bounds(
@@ -140,7 +125,6 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
       _mapController.move(latlong.LatLng(widget.trip.startLatitude, widget.trip.startLongitude), 12.0);
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -154,7 +138,6 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
       double avgLng = _routePointsForMapVisual.map((p) => p.longitude).reduce((a,b) => a+b) / _routePointsForMapVisual.length;
       initialMapCenter = latlong.LatLng(avgLat, avgLng);
     }
-
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.trip.tripTitle.isNotEmpty ? widget.trip.tripTitle : 'Detalles del Recorrido'),
@@ -256,7 +239,6 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
       ),
     );
   }
-
   Widget _buildDetailSection(BuildContext context, {required String title, required IconData icon, required List<Widget> details}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -298,9 +280,7 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
       ),
     );
   }
-
   Widget _buildDetailItem(String label, String value, {bool isMultiline = false}) {
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(

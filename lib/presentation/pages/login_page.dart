@@ -30,8 +30,6 @@ class LoginPage extends StatelessWidget {
           
             ),
           ),
-
-
           Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24.0), 

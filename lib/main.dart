@@ -80,7 +80,7 @@ void main() async {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.teal[700], 
             foregroundColor: Colors.white,   
-            textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Nunito', letterSpacing: 0.5), // Texto un poco más bold
+            textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Nunito', letterSpacing: 0.5), 
             padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(25.0),

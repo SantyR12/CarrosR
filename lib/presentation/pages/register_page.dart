@@ -9,9 +9,7 @@ class RegisterPage extends StatelessWidget {
   final _nameController = TextEditingController();
   final _authController = Get.find<AuthController>();
   final _formKey = GlobalKey<FormState>();
-
   RegisterPage({super.key});
-
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -30,7 +28,6 @@ class RegisterPage extends StatelessWidget {
               ),
             ),
           ),
-
           Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24.0),
@@ -39,7 +36,7 @@ class RegisterPage extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(16.0),
-                   boxShadow: [
+                  boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.1),
                       blurRadius: 10,
@@ -53,7 +50,7 @@ class RegisterPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                       Text(
+                      Text(
                         "Crea tu Cuenta",
                         textAlign: TextAlign.center,
                         style: TextStyle(
@@ -65,7 +62,7 @@ class RegisterPage extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text(
                         "Regístrate para empezar",
-                         textAlign: TextAlign.center,
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.grey[700],
@@ -78,7 +75,7 @@ class RegisterPage extends StatelessWidget {
                               padding: const EdgeInsets.only(bottom:10.0),
                               child: Text(
                                   _authController.error.value,
-                                   textAlign: TextAlign.center,
+                                  textAlign: TextAlign.center,
                                   style: TextStyle(color: Colors.red[700], fontWeight: FontWeight.w500),
                                 ),
                             )
@@ -88,15 +85,15 @@ class RegisterPage extends StatelessWidget {
                         controller: _nameController,
                         decoration: InputDecoration(labelText: 'Nombre Completo', prefixIcon: Icon(Icons.person_outline)),
                         validator: (value) {
-                           if (value == null || value.trim().isEmpty) return 'El nombre es requerido';
-                           return null;
+                          if (value == null || value.trim().isEmpty) return 'El nombre es requerido';
+                          return null;
                         }
                       ),
                       SizedBox(height: 16.0),
                       TextFormField(
                         controller: _emailController,
                         decoration: InputDecoration(labelText: 'Correo Electrónico', prefixIcon: Icon(Icons.email_outlined)),
-                         keyboardType: TextInputType.emailAddress,
+                        keyboardType: TextInputType.emailAddress,
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) return 'El correo es requerido';
                           if (!GetUtils.isEmail(value.trim())) return 'Correo inválido';
