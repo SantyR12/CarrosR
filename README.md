@@ -25,6 +25,25 @@ Recorridos App permite a los usuarios llevar un control preciso de los trayectos
     * Eliminación de recorridos.
 * **Detalles del Recorrido:**
     * Visualización completa de la información del recorrido, incluyendo el mapa de la ruta trazada.
+      
+## 🧱 Arquitectura de Widgets
+
+### Widget Personalizado Reutilizable
+
+* **TripListItem** : Un widget basado en tarjeta que muestra información de viaje individual, incluyendo imagen del vehículo, título del viaje, detalles del vehículo (marca/modelo/año), distancia y fecha de creación. Maneja la carga de imágenes con retrocesos y proporciona funcionalidad eliminación o delete.
+
+---
+### Widgets de Nivel de Página
+
+* **Página de Inicio** : El widget contenedor principal con navegación inferior que cambia entre tres pestañas: lista de viajes, creación de viajes y perfil.
+* **TripsListScreen** : Muestra la colección de viajes del usuario con estados de carga, manejo de errores, estados vacíos y funcionalidad "pull-to-refresh". Utiliza widgets `TripListItem` en una lista desplazable.
+* **CrearTripFormPage** : Un widget de formulario para recopilar información sobre viajes y vehículos, incluida la selección de imágenes, el título del viaje, la marca/modelo/año del vehículo y la descripción antes de proceder a la definición de la ruta.
+* **TripDetallesPágina** : Muestra detalles completos del viaje con un mapa interactivo que muestra polilíneas de ruta, marcadores de inicio/fin, puntos de referencia, información del vehículo y metadatos de viaje.
+* **MapRoutePágina** : Un widget de mapa interactivo para definir rutas de viaje estableciendo puntos de inicio/finalización, calculando distancias usando la API OpenRouteService y visualizando la ruta antes de guardarla.
+* **IniciarSesiónPágina** : Widget de formulario de autenticación con validación de correo electrónico/contraseña y gestión de estado reactiva para el inicio de sesión del usuario.
+* **RegistrarsePágina** : Widget de formulario de registro de usuario que recopila nombre, correo electrónico y contraseña con validación antes de la creación de la cuenta.
+* **EditarProfilePage** : Widget de formulario de edición de perfiles que permite a los usuarios actualizar su nombre, correo electrónico e información telefónica.
+* **PerfilPage**: Un widget para mostrar información de perfil de usuario .
 
 ## 🛠️ Tecnologías Utilizadas
 
@@ -66,35 +85,18 @@ Sigue estos pasos para configurar y ejecutar la aplicación en tu entorno local.
     cd CarrosR
     ```
 
-2.  **Configura las Variables de Entorno:**
-    Este proyecto utiliza un archivo `.env` para gestionar claves API y configuraciones de Appwrite.
-    * Crea un archivo llamado `.env` en la raíz del proyecto.
-    * Añade las siguientes variables con tus propios valores:
 
-        ```env
-        # Archivo .env
-        APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
-        APPWRITE_PROJECT_ID=67e47f27001cb045e766
-        APPWRITE_DATABASE_ID=67e47ff7001ef528b043
-        APPWRITE_USER_COLLECTION_ID=682601b10030b33794da
-        APPWRITE_TRIPS_COLLECTION_ID=682602e3001647bbd434
-        APPWRITE_PROFILE_IMAGES_BUCKET_ID=68260544000a26c4213f
 
-        # Claves de API para servicios de mapas 
-        MAPTILER_API_KEY=IMdKNAWagDsTUpy68b5d
-        OPENROUTESERVICE_API_KEY=5b3ce3597851110001cf62484b05b43d095541ed9a40e378ca759ad5
-        ```
-
-3.  **Obtén las Dependencias de Flutter:**
-     * Pide actualizar la dependencia de intl en la terminal dependiento de tu sdk
+2.  **Obtén las Dependencias de Flutter:**
+     * Pide actualizar la dependencia de intl en la terminal dependiento de tu sdk en mi caso pedia la ^0.19.0
     ```bash
-    flutter pub add intl:^0.20.2
+    flutter pub add intl:^0.19.0
     ```
     ```bash
     flutter pub get
     ```
 
-5.  **Ejecuta la Aplicación:**
+3.  **Ejecuta la Aplicación:**
     * Asegúrate de tener un emulador en ejecución o un dispositivo conectado.
     * Puedes verificar los dispositivos disponibles con: `flutter devices`
     * Ejecuta la aplicación:
